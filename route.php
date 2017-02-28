@@ -9,5 +9,8 @@ $export[] = array($api . '/auth/:action', array('controller' => 'auth', 'module'
 $export[] = array($api . '/user/profile', array('controller' => 'user', 'module' => 'yamb', 'action' => 'profile'));
 $export[] = array($api . '/user/query/:username', array('controller' => 'user', 'module' => 'yamb', 'action' => 'query'));
 
+$export[] = array($api . '/article/:name/:action/:gid', array('controller' => 'article', 'module' => 'yamb', 'action' => null), array('gid' => '\d+'));
+$export[] = array($api . '/article/:name/:action', array('controller' => 'article', 'module' => 'yamb'));
+
 $export[] = array($base, array('controller' => 'index', 'module' => 'yamb'));
 $export[] = array($base . '/:vue', array('controller' => 'index', 'module' => 'yamb', array('vue' => '[\/\w\.-]*')));

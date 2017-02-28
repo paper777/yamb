@@ -9,26 +9,17 @@
       <li :class="{ 'is-active': navActived.profile }"><a @click="navClicked('profile')">我</a></li>
     </ul>
   </div>
+  <topten :feeds="topTen" v-show="navActived.topten"></topten>
   <profile :profile="profile" v-show="navActived.profile"></profile>
-  <!--
-  <feed 
-  v-for="(feed, index) in topTen"
-  :title="feed.title"
-  :desciption="feed.content"
-  :author="feed.user.id"
-  :board="feed.board"
-  :attachment="feed.attachment ? feed.attachment : false"
-  ></feed>
-  -->
 </div>
 </template>
 
 <script>
 import Navbar from 'components/Navbar'
-import Feed from 'components/Feed'
 import * as api from 'api/home'
 import { mapGetters, mapActions } from 'vuex'
 import Profile from './partials/Profile'
+import Topten from './partials/Topten'
 
 export default {
   name: 'hot-feeds',
@@ -36,10 +27,10 @@ export default {
   data () {
     return {
       navActived: {
-        topten: false,
+        topten: true,
         timeline: false,
         favboards: false,
-        profile: true
+        profile: false
       },
       topTen: [
         {
@@ -58,13 +49,13 @@ export default {
 
   created() {
     this.fetchProfile();
-    //this.fetchTopTen();
+    this.fetchTopTen();
   },
 
   components: {
     Navbar,
+    Topten,
     Profile,
-    Feed
   },
 
   methods: {
@@ -92,7 +83,7 @@ export default {
         return;
       }
       api.getProfile().then((res) => {
-        if (res) {
+        if (res.success) {
           this.login(res.data);
         }
       });

@@ -5,8 +5,9 @@ Vue.use(VueRouter)
 
 import Home from 'views/Home'
 import Auth from 'views/Auth'
+import Thread from 'views/Thread'
 
-import store from '../store'
+import store from 'store'
 
 
 const router = new VueRouter({
@@ -27,7 +28,13 @@ const router = new VueRouter({
           path: '/login',
           component: Auth
       },
-    
+
+      {   
+          name: 'Thread',
+          path: '/article/:board/:id',
+          component: Thread
+      },
+
       {   
           path: '*',
           redirect: '/' 
