@@ -1,6 +1,5 @@
 <template>
 <div class="container">
-  <navbar></navbar>
   <div class="tabs is-fullwidth">
     <ul>
       <li :class="{ 'is-active': navActived.topten }"><a @click="navClicked('topten')">今日十大</a></li>
@@ -15,7 +14,6 @@
 </template>
 
 <script>
-import Navbar from 'components/Navbar'
 import * as api from 'api/home'
 import { mapGetters, mapActions } from 'vuex'
 import Profile from './partials/Profile'
@@ -53,7 +51,6 @@ export default {
   },
 
   components: {
-    Navbar,
     Topten,
     Profile,
   },

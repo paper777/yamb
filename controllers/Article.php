@@ -47,7 +47,9 @@ class ArticleController extends NF_YambController {
         $u = User::getInstance();
         $bm = $u->isBM($this->board) || $u->isAdmin();
 
-        load("inc/db");
+        load(["inc/db", "inc/wrapper"]);
+        $wrapper = Wrapper::getInstance();
+
         foreach ($articles as $v) {
             $content = $v->getPlant();
 
@@ -55,7 +57,7 @@ class ArticleController extends NF_YambController {
             $content = preg_replace("/  /", "&nbsp;&nbsp;", $content);
 
             // get source
-            preg_match("|※ 来源:(.*)FROM:.*", $content, $f);
+            preg_match("|※ 来源:(.*)FROM:.*|", $content, $f);
             $source = empty($f) ? "北邮人论坛" : $f[1];
 
             // remove bottom lines
@@ -82,32 +84,38 @@ class ArticleController extends NF_YambController {
             $liked = $db->one('select count(*) as liked from dianzan_usr where articleid = ? and userid_like = ? and bname = ?',array($v->ID,$u->userid,$this->board->NAME));
             $promed = $db->one('select flag from dianzan_stat where articleid = ? and bname = ?',array($v->ID,$this->board->NAME));
 
-            $info[] = [
+            $meta = [
                 "id" => $v->ID,
                 "op" => ($v->OWNER == $u->userid || $bm) ? true : false,
                 "time" => $this->formatTime($v->POSTTIME),
                 "pos" => $v->getPos(),
-                "poster" => $v->OWNER,
                 "content" => $content,
                 "subject" => $v->isSubject(),
                 "voted" => $liked['liked'] ? true : false,
                 "promed" => $promed['flag'],
                 "voteup_count" => $likesum['sum']
             ];
+            try {
+                $meta['poster'] = $wrapper->user(User::getInstance($v->OWNER));
+            } catch(Exception $e) {
+                $meta['poster'] = [ 'id' => $v->OWNER ];
+            }
+            $info[] = $meta;
         }
 
         $data = [
             'gid' => $threads->GROUPID,
             'anony' => $this->board->isAnony(),
-            'reid' => $thread->ID,
+            'reid' => $threads->ID,
+            'time' => $this->formatTime($threads->POSTTIME),
             'title' => nforum_html($threads->TITLE),
-            'board' => $this->board->NAME,
+            'board' => $wrapper->board($this->board),
             'articles' => $info,
             'pagination' => [
             'current' => $pagination->getCurPage(),
                 'total' => $pagination->getTotalPage()
                 ],
-                ];
+            ];
         return $this->success($data);
     }
 
