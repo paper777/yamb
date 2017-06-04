@@ -3,7 +3,7 @@ import router from '../routes'
 
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 
-let base = '/paper/nforum/n/b';
+let base = '/n/b';
 
 export const get = (url, params) => {
     return axios.get(`${base}/${url}.json`, { params: params })
@@ -20,7 +20,7 @@ export const get = (url, params) => {
                 console.log(error);
             }
         });
-}
+};
 
 export const post = (url, params) => {
     const formData = new FormData();
@@ -39,4 +39,4 @@ export const post = (url, params) => {
                 console.log(error);
             }
         });
-}
+};
