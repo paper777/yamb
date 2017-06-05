@@ -1,88 +1,89 @@
 <template>
-<div class="container">
   <div class="main">
-    <div class="header content" >
-      <h1>{{ title }}</h1>
-      <div class="columns is-mobile">
-        <div class="column is-7">
-          <span>{{ time }}</span>
-        </div>
-        <div class="column">
-          <a><span>{{ board.description + '/' + board.name }}</span></a>
-        </div>
-      </div>
-    </div>
-    <hr>
-
-    <div v-if="mainPost" class="article">
-      <div class="poster media">
-        <figure class="media-left">
-        <p class="image is-32x32"> <img :src="mainPost.poster.face_url"> </p>
-        </figure>
-        <div class="media-content">
-          <div class="content">
-            <h4> {{ mainPost.poster.id }}</h4>
-            <small> {{ mainPost.time }}</small>
-          </div>
-        </div>
-        <div class="media-right">
-          <span>楼主</span>
-        </div>
-      </div>
-      <div class="article-body content"  v-html="mainPost.content"> </div>
-    </div>
-    <div class="oops" v-else>
-      // TODO threads without header
-    </div>
-  </div>
-
-  <hr>
-  <div class="posts">
-    <vue-recyclist
-    :list="posts"
-    :size="recyclist.size"
-    :tombstone="true"
-    :loadmore="nextPage">
-    <template slot="tombstone" scope="props">
-    <div class="item tombstone">
-      <div class="avatar"></div>
-      <div class="bubble">
-        <p></p>
-        <p></p>
-        <p></p>
-        <div class="meta">
-          <time class="posted-date"></time>
-        </div>
-      </div>
-    </div>
-    </template>
-      <template slot="item" scope="props">
-      <div :id="props.data.id"> 
-        <div class="poster media">
-          <figure class="media-left">
-          <p class="image is-32x32"> <img :src="props.data.poster ? props.data.poster.face_url : ''"> </p>
-          </figure>
-          <div class="media-content">
-            <div class="content">
-              <h4> {{ props.data.poster ? props.data.poster.id : '已注销'}}</h4>
-              <small> {{ props.data.time }}</small>
+    <section class="thread">
+      <div class="container">
+        <div class="thread-header" v-show="currentPage == 1">
+          <h2>{{ title }}</h2>
+          <div class="columns is-mobile">
+            <div class="column is-7">
+              <small>{{ time }}</small>
+            </div>
+            <div class="column">
+              <a><small>{{ board.description + '/' + board.name }}</small></a>
             </div>
           </div>
-          <div class="media-right">
-            <span>{{ props.index == 0 ? '沙发' : props.index == 1 ? '板凳' : props.index + 1 + '楼' }}</span>
+          <hr>
+        </div>
+
+        <div v-if="mainPost" class="article" v-show="currentPage == 1">
+          <div class="poster media">
+            <figure class="media-left">
+              <p class="image is-32x32"> <img :src="mainPost.poster.face_url"> </p>
+            </figure>
+            <div class="media-content">
+              <div class="content">
+                <h4> {{ mainPost.poster.id }}</h4>
+                <small> {{ mainPost.time }}</small>
+              </div>
+            </div>
+            <div class="media-right">
+              <span>楼主</span>
+            </div>
+          </div>
+          <div class="article-body content"  v-html="mainPost.content"> </div>
+          <hr>
+        </div>
+        <div class="oops" v-else>
+          // TODO threads without header
+          <hr>
+        </div>
+
+        <div class="posts">
+          <div class="post" v-for="(article, index) in posts" :key="index">
+            <div class="poster media">
+              <figure class="media-left">
+                <p class="image is-32x32"> <img :src="article.poster ? article.poster.face_url : ''"> </p>
+              </figure>
+              <div class="media-content">
+                <div class="content">
+                  <h4> {{ article.poster ? article.poster.id : '已注销'}}</h4>
+                  <small> {{ article.time }}</small>
+                </div>
+              </div>
+              <div class="media-right">
+                <span>{{ article.pos == 1 ? '沙发' : article.pos == 2 ? '板凳' : article.pos +  '楼' }}</span>
+              </div>
+            </div>
+            <div class="article-body content" v-html="article.content"> </div>
+            <hr>
           </div>
         </div>
-        <div class="article-body content" v-html="props.data.content"> </div>
-        <hr>
       </div>
-      </template>
-    </vue-recyclist>
-
+    </section>
+    <section class="paginate">
+      <div class="card">
+        <header class="columns is-mobile">
+          <div class="column"> <a>顶10</a> </div>
+          <div class="column">
+            <a @click="getPrevPage">上一页</a>
+          </div>
+          <div class="column">
+            <a>{{ currentPage + '/' + totalPage }}</a>
+          </div>
+          <div class="column">
+            <a @click="getNextPage">下一页</a>
+          </div>
+          <div class="column">
+            <a @click="getReply">回复</a>
+          </div>
+        </header>
+      </div>
+    </section>
   </div>
-</div>
 </template>
+
 <script>
-import * as api from 'api/thread'
+  import * as api from 'api/thread'
 
 import VueRecyclist from 'vue-recyclist'
 
@@ -93,11 +94,7 @@ export default {
         board: '',
         id: ''
       },
-      recyclist: {
-        size: 9,
-        spinner: true,
-        tombstone: !+localStorage['tombstone']
-      },
+      
       title: '加载中...',
       time: '',
       gid: 0,
@@ -105,34 +102,34 @@ export default {
         description: 'loading',
         name: '...'
       },
-      lastPage: 0,
-      anony: false,
-      mainPost: null,
-      posts:  []
-    }
-  },
 
-  components: {
-    VueRecyclist
+      // pagination
+      currentPage: 1,
+      totalPage: 1,
+
+      anony: false,
+
+      // posts
+      mainPost: null,
+      posts: [],
+      cachePosts: {}
+    }
   },
 
   watch: {
-    tombstone(val) {
-      localStorage['tombstone'] = +!val;
-      this.id = 0;
-      this.list = [];
-      this.loadmore();
-    }
   },
 
   created() {
     this.query = this.$route.params;
-    //this.fetchArticles(this.query, this.$route.query);
+    this.fetchArticles();
   },
 
   methods: {
-    nextPage() {
-      const page = ++ this.lastPage;
+    fetchArticles() {
+      const page = this.currentPage;
+      if (page in this.cachePosts) {
+        return this.posts = this.cachePosts[page];
+      }
       api.getThread(this.query.board, this.query.id, { page }).then((res) => {
         if (! res.success) {
           // TODO
@@ -146,35 +143,62 @@ export default {
           this.gid = data.gid;
           this.board = data.board;
           this.anony = data.anony;
+          this.totalPage = data.pagination.total;
           if (data.articles[0]['id'] == this.gid) {
             [this.mainPost, ...this.posts] = data.articles;
-            //this.recyclist.size = data.articles.length - 1;
           } else {
             this.posts = data.articles;
           }
         } else {
-          this.posts = this.posts.concat(data.articles);
-          //this.recyclist.size = data.articles.length;
+          this.posts = data.articles;
         }
+        this.cachePosts[page] = this.posts;
       });
+    },
+
+    getPrevPage() {
+      if (this.currentPage <= 1) {
+        return false;
+      }
+      this.currentPage --;
+      this.fetchArticles();
+    },
+
+    getNextPage() {
+      if (this.currentPage >= this.totalPage) {
+        return false;
+      }
+      this.currentPage ++;
+      this.fetchArticles();
+    },
+
+    getReply() {
     }
 
   }
 }
 </script>
+
 <style scoped>
 h4 {
-  margin: 0;
+    margin: 0;
 }
 .container {
-  padding: 12px 12px;
+    padding: 12px 12px;
+    background-color: #fff;
 }
 .poster.media {
-  margin: 8px 0;
+    margin: 8px 0;
 }
 .article-body.content {
-  color: black;
+    color: black;
 }
-.main .board {
+
+.tread-header {
+    height: 60px;
+}
+.paginate {
+    text-align: center;
+    margin: 1px;
 }
 </style>
