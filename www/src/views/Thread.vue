@@ -83,9 +83,7 @@
 </template>
 
 <script>
-  import * as api from 'api/thread'
-
-import VueRecyclist from 'vue-recyclist'
+import * as api from 'api/thread'
 
 export default {
   data () {
@@ -153,6 +151,7 @@ export default {
           this.posts = data.articles;
         }
         this.cachePosts[page] = this.posts;
+        document.body.scrollTop = document.documentElement.scrollTop = 0;
       });
     },
 

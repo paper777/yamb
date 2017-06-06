@@ -11,6 +11,7 @@ class ArticleController extends NF_YambController {
 
     public function init() {
         parent::init();
+        
         if (! isset($this->params['name'])) {
             $this->abort();
         }
