@@ -11,6 +11,7 @@ $export[] = array($api . '/user/query/:username', array('controller' => 'user', 
 
 $export[] = array($api . '/article/:name/:action/:gid', array('controller' => 'article', 'module' => 'yamb', 'action' => null), array('gid' => '\d+'));
 $export[] = array($api . '/article/:name/:action', array('controller' => 'article', 'module' => 'yamb'));
+$export[] = array($api . '/board/:name', array('controller' => 'board', 'module' => 'yamb'));
 
 $export[] = array($base, array('controller' => 'index', 'module' => 'yamb'));
 $export[] = array($base . '/:vue', array('controller' => 'index', 'module' => 'yamb', array('vue' => '[\/\w\.-]*')));

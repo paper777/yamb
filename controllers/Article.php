@@ -112,27 +112,12 @@ class ArticleController extends NF_YambController {
             'board' => $wrapper->board($this->board),
             'articles' => $info,
             'pagination' => [
-            'current' => $pagination->getCurPage(),
+                'current' => $pagination->getCurPage(),
                 'total' => $pagination->getTotalPage()
-                ],
-            ];
+            ],
+        ];
         return $this->success($data);
     }
 
-    public function formatTime($timestamp) {
-        $gap = time() - $timestamp;
-        $today = strtotime(
-            date("Y-m-d 00:00:00", time())
-        );
-        if ($gap < 300) {
-            $r = '刚刚';
-        } else if ($gap < 3600) {
-            $r = (int) $gap / 60 . '分钟前';
-        } else if ($timestamp > $today) {
-            $r = '今天 '  . date("H:i", $timestamp);
-        } else {
-            $r = date("Y-m-d H:i", $timestamp);
-        }
-        return $r;
-    }
+    
 }
