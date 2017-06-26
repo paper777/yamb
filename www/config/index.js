@@ -33,6 +33,7 @@ module.exports = {
               pathRewrite: {
                   '/n/b': '/paper/nforum/n/b'
               },
+              cookieDomainRewrite: '',
               changeOrigin: true
           }
       },

@@ -65,15 +65,42 @@
 </template>
 
 <script>
+
+import { mapGetters, mapActions } from 'vuex'
+import * as api from 'api/home'
+
 export default {
   data () {
     return {
     }
   }, 
 
-  props: [
-    'profile'
-  ]
+  created() {
+    this.fetchProfile();
+  },
+
+  computed: {
+    ...mapGetters([
+      'profile'
+    ])
+  },
+
+  methods: {
+    fetchProfile() {
+      if (this.profile.isLogin) {
+        return;
+      }
+      api.getProfile().then((res) => {
+        if (res.success) {
+          this.login(res.data);
+        }
+      });
+    },
+
+    ...mapActions([
+      'login'
+    ])
+  }
 }
 </script>
 <style scoped>

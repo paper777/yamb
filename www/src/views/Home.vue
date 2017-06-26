@@ -4,55 +4,45 @@
     <ul>
       <li :class="{ 'is-active': navActived.topten }"><a @click="navClicked('topten')">今日十大</a></li>
       <li :class="{ 'is-active': navActived.timeline }"><a @click="navClicked('timeline')">时间线</a></li>
-      <li :class="{ 'is-active': navActived.favboards }"><a @click="navClicked('favboards')">收藏版面</a></li>
+      <li :class="{ 'is-active': navActived.fav }"><a @click="navClicked('fav')">收藏版面</a></li>
       <li :class="{ 'is-active': navActived.profile }"><a @click="navClicked('profile')">我</a></li>
     </ul>
   </div>
+  <router-view></router-view>
+  <!--
   <topten :feeds="topTen" v-show="navActived.topten"></topten>
   <profile :profile="profile" v-show="navActived.profile"></profile>
+  --->
 </div>
 </template>
 
 <script>
-import * as api from 'api/home'
-import { mapGetters, mapActions } from 'vuex'
-import Profile from './partials/Profile'
-import Topten from './partials/Topten'
-
 export default {
-  name: 'hot-feeds',
+  name: 'home',
 
   data () {
     return {
       navActived: {
         topten: true,
         timeline: false,
-        favboards: false,
+        fav: false,
         profile: false
       },
-      topTen: [
-        {
-          id: 111,
-          title: '加载中...',
-          content: '加载中...',
-          user: {
-            id: 'paper777'
-          },
-          board: '钱塘人家·浙江(Zhejiang)',
-          attachment: null
-        }
-      ]
     }
   },
 
   created() {
-    this.fetchProfile();
-    this.fetchTopTen();
-  },
-
-  components: {
-    Topten,
-    Profile,
+    let activeTab = this.$route.name;
+    if (activeTab == 'Home') {
+      activeTab = 'topten';
+    }
+    for (let key in this.navActived) {
+      if (key == activeTab) {
+        this.navActived[key] = true;
+      } else {
+        this.navActived[key] = false;
+      }
+    }
   },
 
   methods: {
@@ -64,39 +54,11 @@ export default {
           this.navActived[key] = false;
         }
       }
-    },
 
-    fetchTopTen() {
-      api.getTopTen().then((res) => {
-        if (! res.success) {
-          return false;
-        }
-        this.topTen = res.data;
-      });
-    },
-
-    fetchProfile() {
-      if (this.profile.isLogin) {
-        return;
-      }
-      api.getProfile().then((res) => {
-        if (res.success) {
-          this.login(res.data);
-        }
-      });
-    },
-
-    ...mapActions([
-      'login'
-    ])
-
-  },
-
-  computed: {
-    ...mapGetters([
-      'profile'
-    ])
+      this.$router.push('/home/' + item);
+    }
   }
+  
 }
 </script>
 
