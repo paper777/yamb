@@ -1,6 +1,9 @@
 <template>
   <div class="board">
-    <div class="container">
+    <div class="page-loading loader-inner ball-pulse" v-if="isLoading">
+      <div> </div> <div> </div> <div> </div>
+    </div>
+    <div class="container" v-show="! isLoading">
       <div class="board-description">
         <div class="media">
           <content class="media-content">
@@ -30,7 +33,7 @@
         </div>
       </div>
     </div>
-    <section class="paginate">
+    <section class="paginate" v-show="! isLoading && totalPage > 1">
       <div class="card">
         <header class="columns is-mobile">
           <div class="column">
@@ -53,12 +56,13 @@
 import * as api from 'api/board'
 
 export default {
-
   data () {
     return {
       query: {
         board: null
       },
+
+      isLoading: true,
 
       // pagination
       currentPage: 1,
@@ -82,13 +86,14 @@ export default {
 
   methods: {
     fetchBoards() {
+      this.isLoading = true;
       const page = this.currentPage;
       if (page in this.cachedPages) {
+        this.isLoading = false;
         return this.posts = this.cachedPages[page];
       }
 
       api.getBoard(this.query.board, { page }).then((res) => {
-        console.log(res);
         if (! res.success) {
           return false;
         }
@@ -103,6 +108,7 @@ export default {
         this.posts = data.posts;
 
         document.body.scrollTop = document.documentElement.scrollTop = 0;
+        this.isLoading = false;
       });
     },
 

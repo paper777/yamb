@@ -1,6 +1,9 @@
 <template>
   <div class="main">
-    <section class="thread">
+    <div class="page-loading loader-inner ball-pulse" v-if="isLoading">
+      <div> </div> <div> </div> <div> </div>
+    </div>
+    <section class="thread" v-show="! isLoading">
       <div class="container">
         <div class="thread-header" v-show="currentPage == 1">
           <h2>{{ title }}</h2>
@@ -9,7 +12,7 @@
               <small>{{ time }}</small>
             </div>
             <div class="column">
-              <a><small>{{ board.description + '/' + board.name }}</small></a>
+              <a @click="jumpToBoard(board.name)"><small>{{ board.description + '/' + board.name }}</small></a>
             </div>
           </div>
           <hr>
@@ -60,7 +63,7 @@
         </div>
       </div>
     </section>
-    <section class="paginate">
+    <section class="paginate" v-show="! isLoading && totalPage > 1">
       <div class="card">
         <header class="columns is-mobile">
           <div class="column"> <a>顶10</a> </div>
@@ -92,6 +95,8 @@ export default {
         board: '',
         id: ''
       },
+
+      isLoading: true,
       
       title: '加载中...',
       time: '',
@@ -124,8 +129,10 @@ export default {
 
   methods: {
     fetchArticles() {
+      this.isLoading = true;
       const page = this.currentPage;
       if (page in this.cachePosts) {
+        this.isLoading = false;
         return this.posts = this.cachePosts[page];
       }
       api.getThread(this.query.board, this.query.id, { page }).then((res) => {
@@ -152,7 +159,12 @@ export default {
         }
         this.cachePosts[page] = this.posts;
         document.body.scrollTop = document.documentElement.scrollTop = 0;
+        this.isLoading = false;
       });
+    },
+
+    jumpToBoard(name) {
+      this.$router.push('/board/' + name);
     },
 
     getPrevPage() {

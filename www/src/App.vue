@@ -19,5 +19,13 @@ export default {
 <style>
 @import '~normalize.css/normalize.css';
 @import '~bulma/css/bulma.css';
+@import '~loaders.css/loaders.min.css';
 @import './assets/iconfont/iconfont.css';
+.page-loading {
+    text-align: center;
+    margin: 32px 0 32px 0;
+}
+.ball-pulse > div {
+    background-color: #00d1b2;
+}
 </style>

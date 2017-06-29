@@ -1,5 +1,8 @@
 <template>
   <section class="fav-boards">
+    <div class="page-loading loader-inner ball-pulse" v-if="isLoading">
+      <div> </div> <div> </div> <div> </div>
+    </div>
     <div class="bread-nav" v-if="parent >= 0">
       <a class="button is-info is-outlined is-small" @click="getParent()">返回</a>
     </div>
@@ -26,7 +29,8 @@ export default {
   data () {
     return {
       level: 0,
-      parent: 0,
+      isLoading: true,
+      parent: -1,
       boards: []
     }
   },
@@ -38,6 +42,7 @@ export default {
 
   methods: {
     fetchBoards() {
+      this.isLoading = true;
       api.getFavBoards(this.level).then((res) => {
         if (! res.success) {
           // TODO
@@ -46,6 +51,7 @@ export default {
         const data = res.data;
         this.boards = data.boards;
         this.parent = data.parent;
+        this.isLoading = false;
       });
     },
 

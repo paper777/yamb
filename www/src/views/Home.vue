@@ -9,10 +9,6 @@
     </ul>
   </div>
   <router-view></router-view>
-  <!--
-  <topten :feeds="topTen" v-show="navActived.topten"></topten>
-  <profile :profile="profile" v-show="navActived.profile"></profile>
-  --->
 </div>
 </template>
 

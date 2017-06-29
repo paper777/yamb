@@ -1,15 +1,19 @@
 <template>
 <section class="topten">
-  <feed 
-    v-for="(feed, index) in topTen"
-    :key="index"
-    linker="/"
-    :title="feed.title"
-    :desciption="feed.content"
-    :author="feed.user.id"
-    :board="feed.board"
-    :attachment="feed.attachment ? feed.attachment : false">
-  </feed>
+  <div class="page-loading loader-inner ball-pulse" v-if="isLoading">
+    <div> </div> <div> </div> <div> </div>
+  </div>
+  <div v-for="(feed, index) in topTen" class="feeds">
+    <feed 
+      :key="index"
+      linker="/"
+      :title="feed.title"
+      :desciption="feed.content"
+      :author="feed.user.id"
+      :board="feed.board"
+      :attachment="feed.attachment ? feed.attachment : false">
+    </feed>
+  </div>
 </section>
 </template>
 
@@ -21,6 +25,7 @@ import * as api from 'api/home'
 export default {
   data () {
     return {
+      isLoading: true,
       topTen: []
     }
   }, 
@@ -35,11 +40,13 @@ export default {
 
   methods: {
     fetchTopten() {
+      this.isLoading = true;
       api.getTopTen().then((res) => {
         if (! res.success) {
           return false;
         }
         this.topTen = res.data;
+        this.isLoading = false;
       });
     }
   }

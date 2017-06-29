@@ -1,66 +1,69 @@
 <template>
 <section class="profile">
-<div class="user card">
-  <div class="card-content">
-    <div class="media">
-      <figure class="media-left">
-      <p class="image" style="height: 100px; width: 100px;">
-      <img :src="profile.face_url">
-      </p>
-      </figure>
-      <div class="media-content">
-        <div class="content">
-          <p class="title is-4"> <strong>{{ profile.id }}</strong> </p>
-          <div class="items">
-            <p class="subtitle is-6"> {{ profile.user_name }} </p>
-            <p class="subtitle is-6">
-            <i class="iconfont role icon-role" aria-hidden="true"></i> 
-            <span class="role">{{ profile.role }}</span>
-            <i v-if="profile.gender == 'm'" class="iconfont icon-gender_boy" aria-hidden="true"></i> 
-            <i v-else class="iconfont icon-gender_girl" aria-hidden="true"></i> 
-            </p>
+  <div class="page-loading loader-inner ball-pulse" v-if="isLoading">
+    <div> </div> <div> </div> <div> </div>
+  </div>
+  <div class="user card" v-show="! isLoading">
+    <div class="card-content">
+      <div class="media">
+        <figure class="media-left">
+          <p class="image" style="height: 100px; width: 100px;">
+            <img :src="profile.face_url">
+          </p>
+        </figure>
+        <div class="media-content">
+          <div class="content">
+            <p class="title is-4"> <strong>{{ profile.id }}</strong> </p>
+            <div class="items">
+              <p class="subtitle is-6"> {{ profile.user_name }} </p>
+              <p class="subtitle is-6">
+                <i class="iconfont role icon-role" aria-hidden="true"></i> 
+                <span class="role">{{ profile.role }}</span>
+                <i v-if="profile.gender == 'm'" class="iconfont icon-gender_boy" aria-hidden="true"></i> 
+                <i v-else class="iconfont icon-gender_girl" aria-hidden="true"></i> 
+              </p>
+            </div>
           </div>
         </div>
       </div>
     </div>
+    <div class="card-footer">
+      <a class="card-footer-item">
+        <div> {{ profile.life }}</div>
+        <div>生命力</div>
+      </a>
+      <a class="card-footer-item">
+        <div> {{ profile.post_count }} </div>
+        <div> 文章 </div>
+      </a>
+      <a class="card-footer-item">
+        <div> {{ profile.score }} </div>
+        <div> 积分 </div>
+      </a>
+    </div>
   </div>
-  <div class="card-footer">
-    <a class="card-footer-item">
-      <div> {{ profile.life }}</div>
-      <div>生命力</div>
-    </a>
-    <a class="card-footer-item">
-      <div> {{ profile.post_count }} </div>
-      <div> 文章 </div>
-    </a>
-    <a class="card-footer-item">
-      <div> {{ profile.score }} </div>
-      <div> 积分 </div>
-    </a>
-  </div>
-</div>
 
-<div class="pannel-box">
-  <div class="mail box">
-    <i class="iconfont icon-message1"></i>
-    <span > 回复我的 </span>
+  <div class="pannel-box" v-show="! isLoading">
+    <div class="mail box">
+      <i class="iconfont icon-message1"></i>
+      <span > 回复我的 </span>
+    </div>
+    <div class="reply box">
+      <i class="iconfont icon-message3"></i>
+      <span> @我的 </span>
+    </div>
+    <div class="refer box">
+      <i class="iconfont icon-message"></i>
+      <span> 收件箱 </span>
+    </div>
   </div>
-  <div class="reply box">
-    <i class="iconfont icon-message3"></i>
-    <span> @我的 </span>
-  </div>
-  <div class="refer box">
-    <i class="iconfont icon-message"></i>
-    <span> 收件箱 </span>
-  </div>
-</div>
 
-<div class="pannel-box">
-  <div class="refer box">
-    <i class="iconfont icon-message"></i>
-    <span> 设置 </span>
+  <div class="pannel-box">
+    <div class="refer box">
+      <i class="iconfont icon-message"></i>
+      <span> 设置 </span>
+    </div>
   </div>
-</div>
 </section>
 </template>
 
@@ -72,6 +75,7 @@ import * as api from 'api/home'
 export default {
   data () {
     return {
+      isLoading: true
     }
   }, 
 
@@ -90,9 +94,11 @@ export default {
       if (this.profile.isLogin) {
         return;
       }
+      this.isLoading = true;
       api.getProfile().then((res) => {
         if (res.success) {
           this.login(res.data);
+          this.isLoading = false;
         }
       });
     },
@@ -105,41 +111,41 @@ export default {
 </script>
 <style scoped>
 .tabs {
-  margin-bottom: 8px;
+    margin-bottom: 8px;
 }
 span.role {
-  padding-right: 8px;
-  border-right: 1px solid #4a4a4a;
+    padding-right: 8px;
+    border-right: 1px solid #4a4a4a;
 }
 .card-footer {
 }
 .card-footer-item {
-  border-right: 0;
-  display: block;
-  text-align: center;
+    border-right: 0;
+    display: block;
+    text-align: center;
 }
 .card-footer-item div {
-  color: #333;
+    color: #333;
 }
 .pannel-box {
-  margin: 16px 0;
-  border-radius: 5px;
+    margin: 16px 0;
+    border-radius: 5px;
 }
 .pannel-box .box {
-  margin-bottom: 0;
-  border-radius: 0;
+    margin-bottom: 0;
+    border-radius: 0;
 }
 .pannel-box .iconfont {
-  font-size: large;
+    font-size: large;
 }
 .icon-message1 {
-  color: #ffc716;
+    color: #ffc716;
 }
 .icon-message {
-  color: #1296db;
+    color: #1296db;
 }
 .icon-message3 {
-  color: #ffc716;
+    color: #ffc716;
 }
 
 </style>
