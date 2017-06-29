@@ -4,7 +4,9 @@
     <header class="nav">
       <div class="container">
         <div class="nav-left">
-          <div class="nav-item"> 北邮人论坛-alpha</div>
+          <div class="nav-item">
+            <h3 class="title is-6" @click="$router.push('/home')">北邮人论坛-alpha</h3>
+          </div>
         </div>
         <div class="nav-center">
           <div class="nav-item">

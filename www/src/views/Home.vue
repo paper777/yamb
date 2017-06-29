@@ -27,30 +27,34 @@ export default {
     }
   },
 
-  created() {
-    let activeTab = this.$route.name;
-    if (activeTab == 'Home') {
-      activeTab = 'topten';
-    }
-    for (let key in this.navActived) {
-      if (key == activeTab) {
-        this.navActived[key] = true;
-      } else {
-        this.navActived[key] = false;
-      }
+  watch: {
+    $route(to, from) {
+      this.changeTab(to.name);
     }
   },
 
+  created() {
+    let activeTab = this.$route.name;
+    
+    this.changeTab(activeTab);
+  },
+
   methods: {
-    navClicked(item) {
+    changeTab(active) {
+      if (active == 'home') {
+        active = 'topten';
+      }
       for (let key in this.navActived) {
-        if (key == item) {
+        if (key == active) {
           this.navActived[key] = true;
         } else {
           this.navActived[key] = false;
         }
-      }
+      }  
+    },
 
+    navClicked(item) {
+      this.changeTab(item);
       this.$router.push('/home/' + item);
     }
   }

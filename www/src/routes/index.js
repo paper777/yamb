@@ -20,7 +20,7 @@ const router = new VueRouter({
   base: '/n/',
   routes: [
     {
-      name: 'Home',
+      name: 'home',
       path: '/home',
       component: Home,
       meta: {
@@ -53,26 +53,26 @@ const router = new VueRouter({
     },
 
     {
-      name: 'Auth',
+      name: 'auth',
       path: '/login',
       component: Auth
     },
 
     {
-      name: 'Thread',
+      name: 'thread',
       path: '/article/:board/:id',
       component: Thread
     },
 
     {
-      name: 'Board',
+      name: 'board',
       path: '/board/:board/',
       component: Board
     },
 
     {
       path: '*',
-      redirect: '/home/' 
+      redirect: '/home/topten' 
     }
   ]
 });
