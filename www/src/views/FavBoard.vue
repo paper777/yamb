@@ -11,7 +11,7 @@
     </div>
     <div class="columns is-multiline is-mobile is-gapless">
       <div v-for="(board, index) in boards" :key="board.name" class="column is-half">
-        <div class="card">
+        <div class="card fav-board">
           <div class="card-content">
             <a @click="jumpToBoard(board)">
             <p class="title is-6">{{ board.dir ? '[收藏目录]' : '' }} {{  board.desc }}</p>
@@ -75,7 +75,7 @@ export default {
 </script>
 <style scoped>
 .card-content {
-  padding: 8px 0 8px 12px;
+  padding: 8px 4px 8px 12px;
 }
 .empty-tip {
     text-align: center;
@@ -84,4 +84,8 @@ export default {
 .bread-nav {
     margin: 0 0 8px 0;
 }
+.column.is-half {
+    padding: 0 1px 1px 0; 
+}
+
 </style>
