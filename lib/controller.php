@@ -53,7 +53,7 @@ class NF_YambController extends NF_Controller {
         if ($gap < 300) {
             $r = '刚刚';
         } else if ($gap < 3600) {
-            $r = (int) $gap / 60 . '分钟前';
+            $r = (int) ($gap / 60) . '分钟前';
         } else if ($timestamp > $today) {
             $r = '今天 '  . date("H:i", $timestamp);
         } else if ($timestamp > $yestoday) {

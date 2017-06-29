@@ -1,9 +1,11 @@
 <?php
 class HomeController extends NF_YambController {
 
+    const PAGE_SIZE = 20;
+
     public function init() {
         parent::init();
-        //$this->requestLogin();
+        $this->requestLogin();
     }
 
     public function indexAction() { 
@@ -60,34 +62,67 @@ class HomeController extends NF_YambController {
     }
 
     public function timelineAction() {
-        $user = User::getInstance();
+        load(['model/favorpost', 'inc/pagination', 'inc/wrapper', 'inc/ubb']);
 
-        if ($user->isVisitor()) {
-            return $this->fail('这里会显示收藏版面的最新帖子，登录后才能看哦');
-        }
+        $count = c("pagination.threads");
+        $page = isset($this->params['url']['page']) ? (int) $this->params['url']['page'] : 1;
 
+        $u = User::getInstance();
+
+        $fav = new FavorPost($u, static::PAGE_SIZE);
+
+        $pagination = new Pagination($fav, $count);
+
+        $wrapper = Wrapper::getInstance();
         $data = [
-            'articles' => [],
-            'pagination' => ''
+            'article' => [],
+            'pagination' => $wrapper->page($pagination)
         ];
 
-        load('inc/pagination');
-        $count = c("pagination.threads");
-        $page = isset($this->params['url']['page']) ? $this->params['url']['page'] : 1;
-        $page = intval($page);
-
-        $fav = new FavorPost($user, 20);
-        $pagination = new Pagination($fav, $count);
         $articles = $pagination->getPage($page);
-
-        load('inc/wrapper');
-        $wrapper = Wrapper::getInstance();
-        $data['pagination'] = $wrapper->page($pagination);
-        
-        foreach($articles as $v) {
-            $data['articles'][] = $wrapper->feed($v);
+        foreach($articles as $article){
+            $thread = $wrapper->feed($article);
+            $data['article'][] = $thread;
         }
-        $this->set('data', $data);
-    }
-}
 
+        return $this->success($data);
+    }
+
+    public function favAction() {
+        load("model/favor");
+
+        if (! empty($this->params['level'])) {
+            $level = (int) $this->params['level'];
+        } else {
+            $level = 0;
+        }
+
+        try {
+            $favBoards = Favor::getInstance($level);
+        } catch (FavorNullException $e) {
+            $this0>fail('内部错误');
+        }
+
+        $parent = $favBoards->getParent();
+        $parent = $parent ? $parent->getLevel() : -1;
+
+        $boards = [];
+        if ($favBoards->isNull()) {
+            return $this->success(compact('parent', 'boards'));
+        }
+
+        $_boards = $favBoards->getAll();
+        foreach ($_boards as $key => $board) {
+            $boards[] = [
+                'name' => $board->NAME,
+                'desc' => $board->DESC,
+                'dir' => $board->isDir(),
+                'pos' => $board->NPOS,
+                'new' => $board->getTodayNum(),
+                'level' => $board->BID
+            ];
+        }
+        return $this->success(compact('parent', 'boards'));
+    }
+
+}
