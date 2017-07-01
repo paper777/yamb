@@ -17,10 +17,10 @@
             <div class="items">
               <p class="subtitle is-6"> {{ profile.user_name }} </p>
               <p class="subtitle is-6">
-                <i class="iconfont role icon-role" aria-hidden="true"></i> 
+                <i class="iconfont role icon-role" aria-hidden="true"></i>
                 <span class="role">{{ profile.role }}</span>
-                <i v-if="profile.gender == 'm'" class="iconfont icon-gender_boy" aria-hidden="true"></i> 
-                <i v-else class="iconfont icon-gender_girl" aria-hidden="true"></i> 
+                <i v-if="profile.gender == 'm'" class="iconfont icon-gender_boy" aria-hidden="true"></i>
+                <i v-else class="iconfont icon-gender_girl" aria-hidden="true"></i>
               </p>
             </div>
           </div>
@@ -52,7 +52,7 @@
       <i class="iconfont icon-message3"></i>
       <span> @我的 </span>
     </div>
-    <div class="refer box">
+    <div class="refer box" @click="$router.push('/mail/inbox')">
       <i class="iconfont icon-message"></i>
       <span> 收件箱 </span>
     </div>
@@ -77,7 +77,7 @@ export default {
     return {
       isLoading: true
     }
-  }, 
+  },
 
   created() {
     this.fetchProfile();

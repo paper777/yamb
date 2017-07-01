@@ -11,6 +11,9 @@ import FavBoard from 'views/FavBoard'
 import Topten from 'views/Topten'
 import Profile from 'views/Profile'
 import Timeline from 'views/Timeline'
+import Mail from 'views/mail/Mail'
+import MailList from 'views/mail/MailList'
+import MailContent from 'views/mail/MailContent'
 
 import store from 'store'
 
@@ -71,8 +74,26 @@ const router = new VueRouter({
     },
 
     {
+      name: 'mail',
+      path: '/mail',
+      component: Mail,
+      children: [
+        {
+          name: 'mailContent',
+          path: ':type/show/:num',
+          component: MailContent,
+        },
+        {
+          name: 'mailList',
+          path: ':type',
+          component: MailList
+        }
+      ]
+    },
+
+    {
       path: '*',
-      redirect: '/home/topten' 
+      redirect: '/home/topten'
     }
   ]
 });
