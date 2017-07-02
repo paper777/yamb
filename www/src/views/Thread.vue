@@ -26,7 +26,7 @@
             <div class="media-content">
               <div class="content">
                 <h4> {{ mainPost.poster.id }}</h4>
-                <small> {{ mainPost.time }}</small>
+                <small> {{ mainPost.time }} </small>
               </div>
             </div>
             <div class="media-right">
@@ -38,10 +38,35 @@
         </div>
         <div class="oops" v-else>
           // TODO threads without header
+          // CONTRIBUTING: https://github.com/paper777/yamb
           <hr>
         </div>
 
+
+        <div class="popular-replies" v-show="currentPage == 1">
+          <span class="tag is-danger reply-tag">精彩回复</span> 
+          <div class="post" v-for="(article, index) in popularReplies" :key="index">
+            <div class="poster media">
+              <figure class="media-left">
+                <p class="image is-32x32"> <img :src="article.poster ? article.poster.face_url : ''"> </p>
+              </figure>
+              <div class="media-content">
+                <div class="content">
+                  <h4> {{ article.poster ? article.poster.id : '已注销'}}</h4>
+                  <small> {{ article.time }}</small>
+                </div>
+              </div>
+              <div class="media-right">
+                <span>{{ article.pos == 1 ? '沙发' : (article.pos == 2 ? '板凳' : article.pos + '楼') }}</span>
+              </div>
+            </div>
+            <div class="article-body content" v-html="article.content"> </div>
+            <hr>
+          </div>
+        </div>
+
         <div class="posts">
+          <span class="tag is-primary reply-tag" v-show="currentPage == 1">全部回复</span>
           <div class="post" v-for="(article, index) in posts" :key="index">
             <div class="poster media">
               <figure class="media-left">
@@ -115,6 +140,7 @@ export default {
       // posts
       mainPost: null,
       posts: [],
+      popularReplies: [],
       cachePosts: {}
     }
   },
@@ -148,6 +174,7 @@ export default {
           this.gid = data.gid;
           this.board = data.board;
           this.anony = data.anony;
+          this.popularReplies = data.popularReplies;
           this.totalPage = data.pagination.total;
           if (data.articles[0]['id'] == this.gid) {
             [this.mainPost, ...this.posts] = data.articles;
@@ -211,5 +238,8 @@ h4 {
 .paginate {
     text-align: center;
     margin: 1px;
+}
+.reply-tag {
+    margin: 4px 0;
 }
 </style>
