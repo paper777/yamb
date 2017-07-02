@@ -55,11 +55,13 @@ export default {
         this.feeds = this.feeds.concat(res.data.article);
         this.isLoading = false;
         this.isButtonLoading = '';
+        console.log(res.data);
       });
     },
 
     articleLinker(feed) {
-      return "/reply/" + feed.board_name + '/' + feed.group_id;
+      // console.log(feed.id);
+      return "/refer/at/" + feed.id;
     },
 
     loadMore() {
