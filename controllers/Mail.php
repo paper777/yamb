@@ -24,7 +24,7 @@ class MailController extends NF_YambController {
         load("inc/pagination");
         try {
             $pagination = new Pagination($mailBox, 10);
-            $mails = $pagination->getPage($p);
+            $mails = $pagination->getPage($page);
         } catch(MailDataNullException $e) {
             return $this->fail('mailbox is not available');
         }
