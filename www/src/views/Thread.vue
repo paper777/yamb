@@ -58,6 +58,11 @@
               </div>
               <div class="media-right">
                 <span>{{ article.pos == 1 ? '沙发' : (article.pos == 2 ? '板凳' : article.pos + '楼') }}</span>
+                <span>
+                  <a v-if="! article.voted" @click="voteup(article, index)">赞</a>
+                  <a v-else>赞</a>
+                  {{ article.voteup_count }}
+                </span>
               </div>
             </div>
             <div class="article-body content" v-html="article.content"> </div>
@@ -80,6 +85,11 @@
               </div>
               <div class="media-right">
                 <span>{{ article.pos == 1 ? '沙发' : article.pos == 2 ? '板凳' : article.pos +  '楼' }}</span>
+                <span>
+                  <a v-if="! article.voted" @click="voteup(article, index)">赞</a>
+                  <a v-else>赞</a>
+                  {{ article.voteup_count }}
+                </span>
               </div>
             </div>
             <div class="article-body content" v-html="article.content"> </div>
@@ -91,7 +101,10 @@
     <section class="paginate" v-show="! isLoading && totalPage > 1">
       <div class="card">
         <header class="columns is-mobile">
-          <div class="column"> <a>顶10</a> </div>
+          <div class="column">
+            <a v-if="! mainPost.voted" @click="voteup(mainPost, -1)">顶 {{ mainPost.voteup_count }}</a>
+            <a v-else>顶 {{ mainPost.voteup_count }}</a>
+          </div>
           <div class="column">
             <a @click="getPrevPage">上一页</a>
           </div>
@@ -208,6 +221,21 @@ export default {
       }
       this.currentPage ++;
       this.fetchArticles();
+    },
+
+    voteup(article, index) {
+      api.voteup(this.board.name, { id: article.id }).then((res) => {
+        if (! res.success) {
+          // TODO 
+          return false;
+        }
+        article.voted = true;
+        article.voteup_count = res.data.count;
+        if (index == -1) {
+          return this.mainPost = article;
+        }
+        this.posts[index] = article;
+      });
     },
 
     getReply() {
