@@ -7,12 +7,13 @@
             v-bind:class="{ notRead: !read , hasRead: read}">
           {{ title }}
           <!-- The num here is for debugging -->
-          <span class="num">{{ num }}</span>
+          <span class="num is-pulled-right">{{ num }}</span>
         </h4>
 
         <div class="inscribe">
-          <span class="sender">from&nbsp {{ sender }}</span>
-          &nbsp<span class="time">{{ time }}</span>
+          <span class="is-pulled-left">from&nbsp; {{ sender }}</span>
+          &nbsp
+          <span class="is-pulled-right">{{ time }}</span>
         </div>
 
       </div>
@@ -40,20 +41,12 @@
     color: #ccc;
   }
   .notRead {
-    font-weight: normal;
+    /*font-weight: normal;*/
   }
   .hasRead {
     color: #aaa;
   }
-  .sender {
-    float: left;
-  }
-  .time {
-    float: right;
-  }
   .num {
     color: #ccc;
-    font-weight: normal;
-    float: right;
   }
 </style>

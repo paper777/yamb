@@ -25,12 +25,6 @@
       }
     },
 
-    watch: {
-      $route(to, from) {
-        this.changeMailTab(to.name);
-      }
-    },
-
     created() {
       let type = this.$route.params.type;
       this.changeMailTab(type);
@@ -42,9 +36,9 @@
         this.$router.push('/mail/' + type);
       },
 
-      changeMailTab(active) {
+      changeMailTab(type) {
         for (let key in this.mailTabActivated) {
-          this.mailTabActivated[key] = (key === active);
+          this.mailTabActivated[key] = (key === type);
         }
       },
     }

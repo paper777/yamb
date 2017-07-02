@@ -8,8 +8,12 @@ import App from './App'
 import router from './routes/index'
 import store from './store'
 
-Vue.prototype.$http = Axios 
-Vue.prototype.$http.defaults.headers.common = { 
+// These are required by FAB
+require('./assets/animate.min.css');
+require('./assets/icon.css');
+
+Vue.prototype.$http = Axios
+Vue.prototype.$http.defaults.headers.common = {
     'X-Requested-With': 'XMLHttpRequest'
 };
 
