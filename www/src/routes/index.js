@@ -11,9 +11,14 @@ import FavBoard from 'views/FavBoard'
 import Topten from 'views/Topten'
 import Profile from 'views/Profile'
 import Timeline from 'views/Timeline'
+
 import Mail from 'views/mail/Mail'
 import MailList from 'views/mail/MailList'
 import MailContent from 'views/mail/MailContent'
+
+import Reply from 'views/Reply'
+import At from 'views/At'
+import ReplyRead from 'views/ReplyRead'
 
 import store from 'store'
 
@@ -92,9 +97,28 @@ const router = new VueRouter({
     },
 
     {
+      name: 'reply',
+      path: '/reply',
+      component: Reply
+    },
+
+    {
+      name: 'at',
+      path: '/at',
+      component: At
+    },
+
+    {
+      name: 'ReplyRead',
+      path: '/refer/reply/:id',
+      component: ReplyRead
+    },
+
+    {
       path: '*',
       redirect: '/home/topten'
     }
+    
   ]
 });
 

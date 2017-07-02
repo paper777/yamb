@@ -44,11 +44,11 @@
   </div>
 
   <div class="pannel-box" v-show="! isLoading">
-    <div class="mail box">
+    <div class="mail box" @click="$router.push('/reply')">
       <i class="iconfont icon-message1"></i>
       <span > 回复我的 </span>
     </div>
-    <div class="reply box">
+    <div class="reply box" @click="$router.push('/at')">
       <i class="iconfont icon-message3"></i>
       <span> @我的 </span>
     </div>
