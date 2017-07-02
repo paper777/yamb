@@ -59,8 +59,10 @@
               <div class="media-right">
                 <span>{{ article.pos == 1 ? '沙发' : (article.pos == 2 ? '板凳' : article.pos + '楼') }}</span>
                 <span>
-                  <a v-if="! article.voted" @click="voteup(article, index)">赞</a>
-                  <a v-else>赞</a>
+                  <a v-if="! article.voted" @click="voteup(article, index)">
+                    <i class="iconfont icon-voteup"></i>
+                  </a>
+                  <i v-else class="iconfont icon-voteup"></i>
                   {{ article.voteup_count }}
                 </span>
               </div>
@@ -86,8 +88,10 @@
               <div class="media-right">
                 <span>{{ article.pos == 1 ? '沙发' : article.pos == 2 ? '板凳' : article.pos +  '楼' }}</span>
                 <span>
-                  <a v-if="! article.voted" @click="voteup(article, index)">赞</a>
-                  <a v-else>赞</a>
+                  <a v-if="! article.voted" @click="voteup(article, index)">
+                    <i class="iconfont icon-voteup"></i>
+                  </a>
+                  <i v-else class="iconfont icon-voteup"></i>
                   {{ article.voteup_count }}
                 </span>
               </div>
