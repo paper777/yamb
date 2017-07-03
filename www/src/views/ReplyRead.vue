@@ -15,10 +15,11 @@
       </div>
 
       <div class="read-info">
-        <!--<span class="sender is-pulled-left">from: &nbsp;{{ this.sender }}</span>-->
+        <span class="sender is-pulled-left">from: &nbsp;{{ "this.sender" }}</span>
           <span class="time is-pulled-right">{{ this.time }}</span>
       </div>
-      <div></div>
+      <div class="clear"></div>
+      <hr style="height:1px;border:none;border-top:1px solid #aaa;" />
 
       <div class="read-content">
         <div v-html="this.content"></div>
@@ -139,4 +140,26 @@ h4 {
 .reply-tag {
     margin: 4px 0;
 }
+
+
+.ReplyRead {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+  .read-info {
+    color: #aaa;
+  }
+  .clear {
+    clear: both;
+  }
+  .error {
+    text-align:center;
+    color: #aaa;
+  }
+  .textarea {
+
+  }
+  .invisible {
+    visibility: hidden;
+  }
 </style>

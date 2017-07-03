@@ -6,7 +6,7 @@
     </div>
 
     <div v-for="(feed, index) in feeds" class="feeds">
-      <!--<a @click="jumptoarticle"></a>-->
+      
       <feed 
         :key="index"
         :linker="replyLinker(feed)"
