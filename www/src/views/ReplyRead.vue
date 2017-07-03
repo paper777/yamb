@@ -1,116 +1,36 @@
 <template>
   <div class="main">
+    <!--<loading>-->
     <div class="page-loading loader-inner ball-pulse" v-if="isLoading">
       <div> </div> <div> </div> <div> </div>
     </div>
-    <!--<h1>
-        it works!
-        </h1>-->
-    <section class="ReplyRead" v-show="! isLoading">
-      <div class="container">
-        <div class="thread-header" v-show="currentPage == 1">
-          <h2>{{ title }}</h2>
-          <div class="columns is-mobile">
-            <div class="column is-7">
-              <small>{{ time }}</small>
-            </div>
-            <div class="column">
-              <a @click="jumpToBoard(board.name)"><small>{{ board.description + '/' + board.name }}</small></a>
-            </div>
-          </div>
-          <hr>
-        </div>
+    <!--<content>-->
+    <!--<section class="ReplyRead" v-show="! isLoading">-->
+    <div class="ReplyRead" v-if="!isLoading">
 
-        <div v-if="mainPost" class="reply" v-show="currentPage == 1">
-          <div class="poster media">
-            <figure class="media-left">
-              <p class="image is-32x32"> <img :src="mainPost.poster.face_url"> </p>
-            </figure>
-            <div class="media-content">
-              <div class="content">
-                <h4> {{ mainPost.poster.id }}</h4>
-                <small> {{ mainPost.time }} </small>
-              </div>
-            </div>
-            <div class="media-right">
-              <span>楼主</span>
-            </div>
-          </div>
-          <div class="article-body content"  v-html="mainPost.content"> </div>
-          <hr>
-        </div>
-        <div class="oops" v-else>
-          // TODO threads without header
-          // CONTRIBUTING: https://github.com/paper777/yamb
-          <hr>
-        </div>
-
-
-        <div class="popular-replies" v-show="currentPage == 1">
-          <span class="tag is-danger reply-tag">精彩回复</span> 
-          <div class="post" v-for="(article, index) in popularReplies" :key="index">
-            <div class="poster media">
-              <figure class="media-left">
-                <p class="image is-32x32"> <img :src="article.poster ? article.poster.face_url : ''"> </p>
-              </figure>
-              <div class="media-content">
-                <div class="content">
-                  <h4> {{ article.poster ? article.poster.id : '已注销'}}</h4>
-                  <small> {{ article.time }}</small>
-                </div>
-              </div>
-              <div class="media-right">
-                <span>{{ article.pos == 1 ? '沙发' : (article.pos == 2 ? '板凳' : article.pos + '楼') }}</span>
-              </div>
-            </div>
-            <div class="article-body content" v-html="article.content"> </div>
-            <hr>
-          </div>
-        </div>
-
-        <div class="posts">
-          <span class="tag is-primary reply-tag" v-show="currentPage == 1">全部回复</span>
-          <div class="post" v-for="(article, index) in posts" :key="index">
-            <div class="poster media">
-              <figure class="media-left">
-                <p class="image is-32x32"> <img :src="article.poster ? article.poster.face_url : ''"> </p>
-              </figure>
-              <div class="media-content">
-                <div class="content">
-                  <h4> {{ article.poster ? article.poster.id : '已注销'}}</h4>
-                  <small> {{ article.time }}</small>
-                </div>
-              </div>
-              <div class="media-right">
-                <span>{{ article.pos == 1 ? '沙发' : article.pos == 2 ? '板凳' : article.pos +  '楼' }}</span>
-              </div>
-            </div>
-            <div class="article-body content" v-html="article.content"> </div>
-            <hr>
-          </div>
-        </div>
+      <div class="Replytitle">
+        <h4 class="title is-4">
+          {{this.title}}
+        </h4>
       </div>
-    </section>
-    <section class="paginate" v-show="! isLoading && totalPage > 1">
-      <div class="card">
-        <header class="columns is-mobile">
-          <div class="column"> <a>顶10</a> </div>
-          <div class="column">
-            <a @click="getPrevPage">上一页</a>
-          </div>
-          <div class="column">
-            <a>{{ currentPage + '/' + totalPage }}</a>
-          </div>
-          <div class="column">
-            <a @click="getNextPage">下一页</a>
-          </div>
-          <div class="column">
-            <a @click="getReply">回复</a>
-          </div>
-        </header>
+
+      <div class="read-info">
+        <!--<span class="sender is-pulled-left">from: &nbsp;{{ this.sender }}</span>-->
+          <span class="time is-pulled-right">{{ this.time }}</span>
       </div>
-    </section>
+      <div></div>
+
+      <div class="read-content">
+        <div v-html="this.content"></div>
+      </div>
+      <header class="card-header">
+        <a :class="'card-header-title button is-primary ' + isButtonLoading" @click="jumpToArticle()">展开帖子</a>
+      </header>
+
+    </div>
+    
   </div>
+    <!--</section>-->
 </template>
 
 <script>
@@ -120,26 +40,20 @@ export default {
   data () {
     return {
       query: {
-        // board: '',
         id: ''
+      },
+      ReplyRead: {
+        index: null,
+        title:null,
+        time:null,
+        sender:null,
+        content:null
       },
 
       isLoading: true,
+      error:false,
       
-      title: '加载中...',
-      time: '',
-      gid: 0,
-      board: {
-        description: 'loading',
-        name: '...'
-      },
-
-      // pagination
-      currentPage: 1,
-      totalPage: 1,
-
-      anony: false,
-
+      
       // posts
       mainPost: null,
       posts: [],
@@ -160,63 +74,42 @@ export default {
     fetchReplyRead() {
       this.isLoading = true;
       const page = this.currentPage;
-      if (page in this.cachePosts) {
-        this.isLoading = false;
-        return this.posts = this.cachePosts[page];
-      }
-      api.getReplyRead(this.query.id, { page }).then((res) => {
+      
+      api.getReplyRead({refer:this.query.id, index:0}).then((res) => {
         if (! res.success) {
-          // TODO
+          console.log(this.query.id);
+          console.log(res);
+          console.log("get reply failed!");
           return false;
         }
 
+        
         const data = res.data;
         console.log(res.data);
-        if (page == 1) {
+
           this.title = data.title;
           this.time = data.time;
-          this.gid = data.gid;
-          this.board = data.board;
-          this.anony = data.anony;
-          this.popularReplies = data.popularReplies;
-          this.totalPage = data.pagination.total;
-          if (data.articles[0]['id'] == this.gid) {
-            [this.mainPost, ...this.posts] = data.articles;
-          } else {
-            this.posts = data.articles;
-          }
-        } else {
-          this.posts = data.articles;
-        }
-        this.cachePosts[page] = this.posts;
-        document.body.scrollTop = document.documentElement.scrollTop = 0;
+          this.id = data.id;
+          this.board_name = data.board_name;
+          this.content = data.content;
+          this.group_id = data.group_id;
+          
+          
+        
+       
         this.isLoading = false;
       });
     },
 
-    jumpToBoard(name) {
-      this.$router.push('/board/' + name);
+    jumpToArticle(data) {
+      console.log(this.board_name);
+      console.log(this.group_id);
+      this.$router.push('/article/' + this.board_name + "/" + this.group_id);
+
     },
 
-    getPrevPage() {
-      if (this.currentPage <= 1) {
-        return false;
-      }
-      this.currentPage --;
-      this.fetchArticles();
-    },
-
-    getNextPage() {
-      if (this.currentPage >= this.totalPage) {
-        return false;
-      }
-      this.currentPage ++;
-      this.fetchArticles();
-    },
-
-    getReply() {
-    }
-
+   
+    
   }
 }
 </script>

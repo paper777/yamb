@@ -1,9 +1,12 @@
 <template>
   <section class="reply">
+
     <div class="page-loading loader-inner ball-pulse" v-if="isLoading">
       <div> </div> <div> </div> <div> </div>
     </div>
+
     <div v-for="(feed, index) in feeds" class="feeds">
+      <!--<a @click="jumptoarticle"></a>-->
       <feed 
         :key="index"
         :linker="replyLinker(feed)"
@@ -14,11 +17,7 @@
         :attachment="feed.attachment ? feed.attachment : false">
       </feed>
     </div>
-    <div class="load-more card" v-show="! isLoading">
-      <header class="card-header">
-        <a :class="'card-header-title button is-primary ' + isButtonLoading" @click="loadMore()">加载更多...</a>
-      </header>
-    </div>
+
   </section>
 </template>
 <script>
@@ -28,8 +27,6 @@ import Feed from 'components/Feed'
 export default {
   data () {
     return {
-      page: 1,
-      isButtonLoading: '',
       isLoading: true,
       feeds: []
     }
@@ -46,12 +43,14 @@ export default {
   methods: {
     fetchReply(page) {
       this.isLoading = true;
-      this.isButtonLoading = 'is-loading';
+      // this.isButtonLoading = 'is-loading';
       api.getReply({ page }).then((res) => {
         if (! res.success) {
+          console.log("Get reply list failed! Please try again!")
           return false;
         }
 
+        console.log(res.data.article);
         this.feeds = this.feeds.concat(res.data.article);
         this.isLoading = false;
         this.isButtonLoading = '';
@@ -62,12 +61,15 @@ export default {
 
     replyLinker(feed) {
         console.log(feed.id);
-      return "/refer/reply/" + feed.id;
+        // this.$router.push("ReplyRead",{feedid:feed.id});
+      // return "/refer/reply/read.json&" + feed.id;
+      return "/refer/reply/"+ feed.id;
+      // return "/article/" + feed.board_name + '/' + feed.group_id
     },
 
-    loadMore() {
-      this.fetchReply(++ this.page);
-    }
+    // loadMore() {
+    //   this.fetchReply(++ this.page);
+    // }
   }
 }
 </script>
