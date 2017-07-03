@@ -129,7 +129,7 @@
     </div>
 
     <!-- FAB -->
-    <div>
+    <div v-if="!error">
       <fab
         :position="fab.position"
         :bg-color="fab.bgColor"
@@ -152,20 +152,19 @@
   export default {
     data() {
       return {
+
         query: {
           type: '',
           num: ''
         },
+
         mail: {
-          num: null,
-          title: null,
-          sender: null,
-          time: null,
-          content: null
+          num: '',
+          title: '',
+          sender: '',
+          time: '',
+          content: ''
         },
-        isLoading: true,
-        error: false,
-        errorMessage: '',
 
         modalActive: {
           replyModal: false,
@@ -208,7 +207,12 @@
               // tooltip: '删除'
             },
           ]
-        }
+        },
+
+        isLoading: true,
+        error: false,
+        errorMessage: '',
+
       }
     },
 
@@ -236,6 +240,9 @@
           this.mail.sender = res.data.sender;
           this.mail.time = res.data.time;
           this.mail.content = res.data.content;
+
+          this.replyForm.title = this.mail.title.startsWith('Re: ') ?
+            this.mail.title: 'Re: ' + this.mail.title;
         });
         this.error = false;
         this.isLoading = false;
@@ -266,33 +273,64 @@
       },
 
       sendReply() {
-        // TODO
+        // TODO: this does not work
         this.replyForm.isTitleDanger = ('' === this.replyForm.title);
         this.replyForm.isContentDanger = ('' === this.replyForm.content);
         if (this.replyForm.isTitleDanger || this.replyForm.isContentDanger) {
           return false;
         }
         // Send request
+        let params = {
+          type: this.query.type,
+          title: this.replyForm.title,
+          content: this.replyForm.content,
+          num: this.query.num,
+        };
+        console.log(params);
+        api.replyMail(params).then((res) => {
+          if (! res.success) {
+            console.log("Send Reply Failed!");
+          }
+          console.log("data: " + res.data);
+          console.log("status: " + res.status);
+          console.log("statusText: " + res.statusText);
+        });
         // Handle res
         // Show result
       },
 
       forwardMail() {
-        // TODO
+        // TODO: this does not work
         this.forwardForm.isTargetUserDanger = ('' === this.forwardForm.targetUser);
         if (this.forwardForm.isTargetUserDanger) {
           return false;
         }
         // Send request
+        let params = {id: this.forwardForm.targetUser};
+        api.forwardMail(this.query.type, this.query.num, params).then((res) => {
+            if (! res.success) {
+                console.log("Forward Mail Failed!");
+                return false;
+            }
+            console.log("data: " + res.data);
+            console.log("status: " + res.status);
+            console.log("statusText: " + res.statusText);
+        });
         // Handle res
         // Show result
       },
 
       deleteMail() {
-        // TODO
+        // TODO: can delete mail now, need notification and page jumps.
         // Send request
-        // if success -> jump to mail list
-        // else -> Show result
+        let params = {};
+        api.deleteMail(this.query.type, this.query.num, params).then((res) => {
+          if (! res.success) {
+              console.log("Delete Mail Failed!");
+              return false;
+          }
+        });
+        // After successful delete ...
       }
     }
   }
