@@ -53,6 +53,7 @@ export default {
 
       isLoading: true,
       error:false,
+      isButtonLoading:'',
       
       
       // posts
@@ -94,7 +95,8 @@ export default {
           this.board_name = data.board_name;
           this.content = data.content;
           this.group_id = data.group_id;
-          
+          this.pos = data.pos;
+          this.isButtonLoading='';
           
         
        
@@ -105,7 +107,8 @@ export default {
     jumpToArticle(data) {
       console.log(this.board_name);
       console.log(this.group_id);
-      this.$router.push('/article/' + this.board_name + "/" + this.group_id);
+      console.log(this.pos);
+      this.$router.push('/article/' + this.board_name + "/" + this.group_id + "?pos=" + this.pos);
 
     },
 

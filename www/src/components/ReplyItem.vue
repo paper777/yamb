@@ -1,7 +1,7 @@
 <template>
 <router-link :to="linker">
-  <section class="feed box">
-  <div class="feed-content ">
+  <section class="reply box">
+  <div class="reply-content ">
     <div class="content">
       <h4 class="title is-4">
         <slot name="header">
@@ -17,8 +17,8 @@
         </div>
       </div>
     </div>
-    <div class="author">
-      by&nbsp<span class="author">{{ user }}</span>
+    <div class="user">
+      by&nbsp<span class="user">{{ user }}</span>
       from&nbsp<span class="board">{{ board }}</span>
     </div>
   </div>
@@ -28,24 +28,24 @@
 
 <script>
 export default {
-  name: 'feed',
+  name: 'reply',
   props: [
+    'id',
     'title',
-    'desciption',
-    'author',
+    'index',
     'board',
-    'attachment',
-    'linker'
+    'read',
+    'time'
   ]
 }
 </script>
 
 <style scoped>
-.feed-content p {
+.reply-content p {
   color: #aaa;
 }
 
-.feed-content .author {
+.reply-content .user {
   color: #ccc;
 }
 
