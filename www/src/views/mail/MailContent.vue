@@ -44,7 +44,7 @@
           <div class="field">
             <label class="label">标题</label>
             <p class="control">
-              <input class="input" type="text"
+              <input class="input" type="text" name="title"
                      v-model="replyForm.title"
                      v-bind:class="{'is-danger': replyForm.isTitleDanger}"
                      @focus="cancelDanger"
@@ -59,7 +59,7 @@
           <div class="field">
             <label class="label">内容</label>
             <p class="control">
-                <textarea class="textarea"
+                <textarea class="textarea" name="content"
                           v-model="replyForm.content"
                           v-bind:class="{'is-danger': replyForm.isContentDanger}"
                           @focus="cancelDanger"
@@ -91,7 +91,7 @@
           <div class="field">
             <label class="label">收件人</label>
             <p class="control">
-              <input class="input" type="text"
+              <input class="input" type="text" name="targetUser"
                      v-model="forwardForm.targetUser"
                      v-bind:class="{'is-danger': forwardForm.isTargetUserDanger}"
                      @focus="cancelDanger"
@@ -139,6 +139,14 @@
         @reply="fabReplyClicked"
         @delete="fabDeleteClicked"
       ></fab>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification is-primary is-fullwidth"
+         v-bind:class="{'is-hidden': !hasNotification}"
+    >
+      <button class="delete large" @click="closeNotification"></button> <!-- TODO: `.is-large` not working -->
+      {{ notificationMessage }}
     </div>
 
   </div>
@@ -210,6 +218,10 @@
         },
 
         isLoading: true,
+
+        hasNotification: false,
+        notificationMessage: '',
+
         error: false,
         errorMessage: '',
 
@@ -250,13 +262,19 @@
 
       fabReplyClicked() {
         this.modalActive.replyModal = !this.modalActive.replyModal;
+        this.modalActive.forwardModal = false;
+        this.modalActive.deleteModal = false;
       },
 
       fabForwardClicked() {
+        this.modalActive.replyModal = false;
         this.modalActive.forwardModal = !this.modalActive.forwardModal;
+        this.modalActive.deleteModal = false;
       },
 
       fabDeleteClicked() {
+        this.modalActive.replyModal = false;
+        this.modalActive.forwardModal = false;
         this.modalActive.deleteModal = !this.modalActive.deleteModal;
       },
 
@@ -272,6 +290,20 @@
         this.forwardForm.isTargetUserDanger = false;
       },
 
+      showNotification(notificationMessage) {
+        this.notificationMessage = notificationMessage;
+        this.hasNotification = true;
+        let t = this;
+        let timer = setTimeout(function(){
+          t.closeNotification();
+        }, 3000);
+      },
+
+      closeNotification() {
+        // TODO: May add disappear animation
+        this.hasNotification = false;
+      },
+
       sendReply() {
         // TODO: this does not work
         this.replyForm.isTitleDanger = ('' === this.replyForm.title);
@@ -281,22 +313,25 @@
         }
         // Send request
         let params = {
-          type: this.query.type,
           title: this.replyForm.title,
           content: this.replyForm.content,
-          num: this.query.num,
         };
         console.log(params);
-        api.replyMail(params).then((res) => {
+        api.replyMail(this.query.type, this.query.num, params).then((res) => {
           if (! res.success) {
             console.log("Send Reply Failed!");
+            console.log("res.success: " + res.success);
+            return false;
+          }
+          if (! res.data) {
+            console.log("Send Reply Failed!");
+            console.log("res.data: " + res.data);
+            return false;
           }
           console.log("data: " + res.data);
-          console.log("status: " + res.status);
-          console.log("statusText: " + res.statusText);
+          this.closeModal();
+          this.showNotification("回复成功");
         });
-        // Handle res
-        // Show result
       },
 
       forwardMail() {
@@ -306,18 +341,25 @@
           return false;
         }
         // Send request
-        let params = {id: this.forwardForm.targetUser};
+        let params = {"target": this.forwardForm.targetUser};
         api.forwardMail(this.query.type, this.query.num, params).then((res) => {
-            if (! res.success) {
-                console.log("Forward Mail Failed!");
-                return false;
-            }
-            console.log("data: " + res.data);
-            console.log("status: " + res.status);
-            console.log("statusText: " + res.statusText);
+          if (! res.success) {
+            console.log("Forward Reply Failed!");
+            console.log("res.success: " + res.success);
+            return false;
+          }
+          if (! res.data) {
+            console.log("Forward Reply Failed!");
+            console.log("res.data: " + res.data);
+            return false;
+          }
+          console.log("data: " + res.data);
+          console.log("status: " + res.status);
+          console.log("statusText: " + res.statusText);
         });
-        // Handle res
-        // Show result
+        console.log("data: " + res.data);
+        this.closeModal();
+        this.showNotification("转发成功");
       },
 
       deleteMail() {
@@ -326,11 +368,23 @@
         let params = {};
         api.deleteMail(this.query.type, this.query.num, params).then((res) => {
           if (! res.success) {
-              console.log("Delete Mail Failed!");
-              return false;
+            console.log("Delete Mail Failed!");
+            return false;
           }
+          if (! res.data) {
+            console.log("Got a response of {data: false}");
+            // TODO: May need notification here
+            return false;
+          }
+          // Delete successful
+          // jump to mail list page, and give notification
+          let queryParams = {
+            hasNotification: true,
+            notificationType: "deleted",
+            mailTitle: this.mail.title.len < 10 ? this.mail.title: this.mail.title.slice(0, 10) + "...",
+          };
+          this.$router.push({ name: 'mailList', params: { type: this.query.type }, query: queryParams});
         });
-        // After successful delete ...
       }
     }
   }
@@ -343,6 +397,11 @@
   }
   .mail-inscribe {
     color: #aaa;
+  }
+  .notification {
+    width: 100%;
+    position: fixed;
+    bottom: 0;
   }
   .clear {
     clear: both;

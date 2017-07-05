@@ -33,7 +33,7 @@
     methods: {
       mailTabClicked(type) {
         this.changeMailTab(type);
-        this.$router.push('/mail/' + type);
+         this.$router.push({name: 'mailList', params: {type: type}});
       },
 
       changeMailTab(type) {

@@ -26,15 +26,17 @@ export const sendMail = (params) => post(`mail/send`, params);
 
 /**
  * Reply a mail
- * @param params - { type: string , title: string, content: string, num: int }
+ * @param type - one of ['inbox', 'outbox', 'deleted']
+ * @param num - the mail num (id)
+ * @param params - { title: string, content: string, num: int }
  */
-export const replyMail = (params) => post(`mail/send`, params);
+export const replyMail = (type, num, params) => post(`mail/${type}/send/${num}`, params);
 
 /**
  * Forward a mail
  * @param type - one of ['inbox', 'outbox', 'deleted']
  * @param num - the mail num (id)
- * @param params - {id: (the account id of receiver)}
+ * @param params - { id: (the account id of receiver) }
  */
 export const forwardMail = (type, num, params) => post(`mail/${type}/forward/${num}`, params);
 
