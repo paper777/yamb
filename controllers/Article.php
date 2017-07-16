@@ -73,7 +73,7 @@ class ArticleController extends NF_YambController {
 
             // parse attachments
             $content = $article->parseAtt($content, 'middle');
-            if(c("ubb.parse")){
+            if (c("ubb.parse")) {
                 load('inc/ubb');
                 $content = XUBB::parse($content);
             }

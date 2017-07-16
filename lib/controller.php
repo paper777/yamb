@@ -4,7 +4,7 @@ class NF_YambController extends NF_Controller {
     protected $_exts = array('json'=> 'application/json');
 
     public function init(){
-        c('application.encoding', 'utf-8');
+        c('application.encoding', 'UTF-8');
         parent::init();
         $this->getRequest()->front = true;
     }
@@ -51,16 +51,17 @@ class NF_YambController extends NF_Controller {
         );
         $yestoday = $today - 86400;
         if ($gap < 300) {
-            $r = 'åˆšåˆš';
+            $r = '¸Õ¸Õ';
         } else if ($gap < 3600) {
-            $r = (int) ($gap / 60) . 'åˆ†é’Ÿå‰';
+            $r = (int) ($gap / 60) . '·ÖÖÓÇ°';
         } else if ($timestamp > $today) {
-            $r = 'ä»Šå¤© '  . date("H:i", $timestamp);
+            $r = '½ñÌì '  . date("H:i", $timestamp);
         } else if ($timestamp > $yestoday) {
             $r = date("Y-m-d H:i", $timestamp);
         } else {
             $r = date("Y-m-d", $timestamp);
         }
+
         return $r;
     }
 }

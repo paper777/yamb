@@ -37,7 +37,7 @@ class MailController extends NF_YambController {
                     "num" => $v->num,
                     "sender" => $v->OWNER,
                     "title" => nforum_html($v->TITLE),
-                    "time" => $this->formatTime($v->POSTIME),
+                    "time" => $this->formatTime($v->POSTTIME),
                     "size" => $v->EFFSIZE
                 ];
             }
@@ -106,7 +106,7 @@ class MailController extends NF_YambController {
             $type = $this->params['type'];
             $num = $this->params['num'];
             try {
-                $mail = MAIL::getInstance($num, new MailBox($u,$type));
+                $mail = MAIL::getInstance($num, new MailBox($u, $type));
             } catch(Exception $e) {
                 return $this->fail('mail sender component not available');
             }
@@ -124,8 +124,8 @@ class MailController extends NF_YambController {
 
         $sig = 0;
         $bak = isset($this->params['form']['backup']) ? 1 : 0;
-        $title = nforum_iconv($this->encoding, 'utf-8', $title);
-        $content = nforum_iconv($this->encoding, 'utf-8', $content);
+        $title = nforum_iconv($this->encoding, 'GBK', $title);
+        $content = nforum_iconv($this->encoding, 'GBK', $content);
 
         if ($mail === false) { // send new
             if (! isset($this->params['form']['id'])) {
@@ -137,7 +137,7 @@ class MailController extends NF_YambController {
             } catch (MailSendException $e) {
                 return $this->fail($e->getMessage());
             }
-            return $this->success(true);
+            return $this->success();
         }
 
         // reply 
@@ -147,7 +147,7 @@ class MailController extends NF_YambController {
             return $this->fail($e->getMessage());
         }
 
-        return $this->success(true);
+        return $this->success();
     }
 
     public function forwardAction() {
@@ -183,8 +183,10 @@ class MailController extends NF_YambController {
             $mail->forward($target, $noansi, $big5);
         } catch(MailSendException $e) {
             return $this->fail($e->getMessage());
+        } catch(Exception $e) {
+            return $this->fail($e->getMessage());
         }
-        return $this->success(true);
+        return $this->success();
     }
 
     public function deleteAction() {
@@ -212,6 +214,6 @@ class MailController extends NF_YambController {
         } catch(Exception $e) {
             return $this->fail('delete failed');
         }
-        return $this->success(true);
+        return $this->success();
     }
 }
