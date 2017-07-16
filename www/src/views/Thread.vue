@@ -43,7 +43,7 @@
         </div>
 
 
-        <div class="popular-replies" v-show="currentPage == 1">
+        <div class="popular-replies" v-show="currentPage == 1 && popularReplies.length">
           <span class="tag is-danger reply-tag">精彩回复</span> 
           <div class="post" v-for="(article, index) in popularReplies" :key="index">
             <div class="poster media">
@@ -73,7 +73,7 @@
         </div>
 
         <div class="posts">
-          <span class="tag is-primary reply-tag" v-show="currentPage == 1">全部回复</span>
+          <span class="tag is-primary reply-tag" v-show="currentPage == 1 && posts.length">全部回复</span>
           <div class="post" v-for="(article, index) in posts" :key="index">
             <div class="poster media">
               <figure class="media-left">
