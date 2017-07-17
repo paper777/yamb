@@ -4,7 +4,7 @@
       <div> </div> <div> </div> <div> </div>
     </div>
     <div v-for="(feed, index) in feeds" class="feeds">
-      <feed 
+      <feed
         :key="index"
         :linker="articleLinker(feed)"
         :title="feed.title"
@@ -51,7 +51,6 @@ export default {
         if (! res.success) {
           return false;
         }
-
         this.feeds = this.feeds.concat(res.data.article);
         this.isLoading = false;
         this.isButtonLoading = '';

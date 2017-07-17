@@ -139,7 +139,7 @@ export default {
       },
 
       isLoading: true,
-      
+
       title: '加载中...',
       time: '',
       gid: 0,
