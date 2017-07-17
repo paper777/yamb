@@ -1,24 +1,23 @@
 <template>
   <section class="at">
+
     <div class="page-loading loader-inner ball-pulse" v-if="isLoading">
       <div> </div> <div> </div> <div> </div>
     </div>
+
     <div v-for="(feed, index) in feeds" class="feeds">
+      
       <feed 
         :key="index"
-        :linker="articleLinker(feed)"
+        :linker="at(feed)"
         :title="feed.title"
         :desciption="feed.content"
-        :author="feed.user.id"
+        :author="feed.user"
         :board="feed.board"
         :attachment="feed.attachment ? feed.attachment : false">
       </feed>
     </div>
-    <div class="load-more card" v-show="! isLoading">
-      <header class="card-header">
-        <a :class="'card-header-title button is-primary ' + isButtonLoading" @click="loadMore()">加载更多...</a>
-      </header>
-    </div>
+
   </section>
 </template>
 <script>
@@ -28,8 +27,6 @@ import Feed from 'components/Feed'
 export default {
   data () {
     return {
-      page: 1,
-      isButtonLoading: '',
       isLoading: true,
       feeds: []
     }
@@ -40,33 +37,33 @@ export default {
   },
 
   created() {
-    this.fetchAt(this.page);
+    this.fetchat(this.page);
   },
 
   methods: {
-    fetchAt(page) {
+    fetchat(page) {
       this.isLoading = true;
-      this.isButtonLoading = 'is-loading';
+      // this.isButtonLoading = 'is-loading';
       api.getAt({ page }).then((res) => {
         if (! res.success) {
+          console.log("Get at list failed! Please try again!")
           return false;
         }
 
+        console.log(res.data.article);
         this.feeds = this.feeds.concat(res.data.article);
         this.isLoading = false;
         this.isButtonLoading = '';
         console.log(res.data);
       });
     },
+    // console.log(res.data);
 
-    articleLinker(feed) {
-      // console.log(feed.id);
-      return "/refer/at/" + feed.id;
+    atLinker(feed) {
+        console.log(feed.id);
+      return "/refer/at/"+ feed.id;
     },
 
-    loadMore() {
-      this.fetchAt(++ this.page);
-    }
   }
 }
 </script>

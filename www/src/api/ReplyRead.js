@@ -1,3 +1,3 @@
 import { get, post } from './wrapper'
 
-export const getReplyRead = ( params) => get(`refer/reply/read`, params)
+export const getReplyRead = (id, params) => get(`refer/reply/${id}`, params)

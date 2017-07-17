@@ -12,7 +12,7 @@
         :linker="replyLinker(feed)"
         :title="feed.title"
         :desciption="feed.content"
-        :author="feed.user.id"
+        :author="feed.user"
         :board="feed.board"
         :attachment="feed.attachment ? feed.attachment : false">
       </feed>
@@ -61,15 +61,9 @@ export default {
 
     replyLinker(feed) {
         console.log(feed.id);
-        // this.$router.push("ReplyRead",{feedid:feed.id});
-      // return "/refer/reply/read.json&" + feed.id;
       return "/refer/reply/"+ feed.id;
-      // return "/article/" + feed.board_name + '/' + feed.group_id
     },
 
-    // loadMore() {
-    //   this.fetchReply(++ this.page);
-    // }
   }
 }
 </script>
