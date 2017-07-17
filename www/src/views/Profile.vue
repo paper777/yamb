@@ -58,9 +58,9 @@
     </div>
   </div>
 
-  <div class="pannel-box">
+  <div class="pannel-box" v-show="! isLoading">
     <div class="refer box">
-      <i class="iconfont icon-message"></i>
+      <i class="iconfont icon-setting"></i>
       <span> 设置 </span>
     </div>
   </div>

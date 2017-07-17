@@ -1,7 +1,9 @@
 <template>
   <div id="app">
     <navbar></navbar>
-    <router-view></router-view>
+    <div class="app-main">
+      <router-view></router-view>
+    </div>
   </div>
 </template>
 
@@ -20,7 +22,9 @@ export default {
 @import '~normalize.css/normalize.css';
 @import '~bulma/css/bulma.css';
 @import '~loaders.css/loaders.min.css';
-@import './assets/iconfont/iconfont.css';
+.app-main {
+    background-color: #f7f8fa;
+}
 .page-loading {
     text-align: center;
     margin: 32px 0 32px 0;

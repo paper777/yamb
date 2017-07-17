@@ -48,5 +48,4 @@ export default {
 .nav .nav-right a {
   text-align: right;
 }
-
 </style>

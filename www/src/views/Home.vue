@@ -64,6 +64,7 @@ export default {
 
 <style scoped>
 .tabs {
-  margin-bottom: 8px;
+    margin-bottom: 0px;
+    background-color: #fff;
 }
 </style>
