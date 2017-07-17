@@ -84,7 +84,6 @@
         api.getMailList(type)
           .then((res) =>{
             if(!res.success) {
-              console.log('Get mail list failed!');
               return false;
             }
             this.mails = this.mails.concat(res.data.mails);

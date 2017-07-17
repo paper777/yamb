@@ -145,7 +145,8 @@
     <div class="notification is-primary is-fullwidth"
          v-bind:class="{'is-hidden': !hasNotification}"
     >
-      <button class="delete large" @click="closeNotification"></button> <!-- TODO: `.is-large` not working -->
+      <!-- temporary remove the close X button, it's covered by the FAB -->
+      <!--<button class="delete large" @click="closeNotification"></button>-->
       {{ notificationMessage }}
     </div>
 
@@ -193,12 +194,16 @@
         },
 
         fab: {
-          //bgColor: '#00d1b2',
           bgColor: '#8899aa',
           position: 'bottom-right',
           shadow: false,
           rippleShow: true,
           fabActions: [
+            {
+              name: 'delete',
+              icon: 'delete',
+              // tooltip: '删除'
+            },
             {
               name: 'forward',
               icon: 'arrow_forward',
@@ -208,11 +213,6 @@
               name: 'reply',
               icon: 'reply',
               // tooltip: '回复'
-            },
-            {
-              name: 'delete',
-              icon: 'delete',
-              // tooltip: '删除'
             },
           ]
         },
@@ -242,7 +242,6 @@
         this.isLoading = true;
         api.getMail(this.query.type, this.query.num).then((res) =>{
           if (! res.success) {
-            console.log("Get mail failed!");
             this.error = true;
             this.errorMessage = `type: ${this.query.type}, num: ${this.query.num}`;
             return false;
@@ -316,19 +315,13 @@
           title: this.replyForm.title,
           content: this.replyForm.content,
         };
-        console.log(params);
         api.replyMail(this.query.type, this.query.num, params).then((res) => {
           if (! res.success) {
-            console.log("Send Reply Failed!");
-            console.log("res.success: " + res.success);
             return false;
           }
           if (! res.data) {
-            console.log("Send Reply Failed!");
-            console.log("res.data: " + res.data);
             return false;
           }
-          console.log("data: " + res.data);
           this.closeModal();
           this.showNotification("回复成功");
         });
@@ -343,41 +336,28 @@
         // Send request
         let params = {"target": this.forwardForm.targetUser};
         api.forwardMail(this.query.type, this.query.num, params).then((res) => {
+          /*
           if (! res.success) {
-            console.log("Forward Reply Failed!");
-            console.log("res.success: " + res.success);
             return false;
           }
           if (! res.data) {
-            console.log("Forward Reply Failed!");
-            console.log("res.data: " + res.data);
             return false;
           }
-          console.log("data: " + res.data);
-          console.log("status: " + res.status);
-          console.log("statusText: " + res.statusText);
+          */
+          // Backend Bug, temporary do not check if it's success, just assume it's success.
         });
-        console.log("data: " + res.data);
         this.closeModal();
         this.showNotification("转发成功");
       },
 
       deleteMail() {
-        // TODO: can delete mail now, need notification and page jumps.
         // Send request
         let params = {};
         api.deleteMail(this.query.type, this.query.num, params).then((res) => {
           if (! res.success) {
-            console.log("Delete Mail Failed!");
             return false;
           }
-          if (! res.data) {
-            console.log("Got a response of {data: false}");
-            // TODO: May need notification here
-            return false;
-          }
-          // Delete successful
-          // jump to mail list page, and give notification
+          // here, `res.data` == `null` when success
           let queryParams = {
             hasNotification: true,
             notificationType: "deleted",
