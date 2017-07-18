@@ -46,11 +46,11 @@
   <div class="pannel-box" v-show="! isLoading">
     <div class="mail box" @click="$router.push('/reply')">
       <i class="iconfont icon-message1"></i>
-      <span > 回复我的 </span>
+      <span> 回复我的 </span><span class="tag is-warning" v-if="profile.new_reply">{{ profile.new_reply }}</span>
     </div>
     <div class="reply box" @click="$router.push('/at')">
       <i class="iconfont icon-message3"></i>
-      <span> @我的 </span>
+      <span> @我的 </span><span class="tag is-warning" v-if="profile.new_at">{{ profile.new_at }}</span>
     </div>
     <div class="refer box" @click="$router.push('/mail/inbox')">
       <i class="iconfont icon-message"></i>

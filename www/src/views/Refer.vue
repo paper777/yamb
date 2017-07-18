@@ -23,6 +23,7 @@
 <script>
 import * as api from 'api/refer'
 import Feed from 'components/Feed'
+import { mapActions } from 'vuex'
 
 export default {
   data () {
@@ -57,15 +58,25 @@ export default {
     },
 
     setRead(feed) {
-      let index = feed.index
+      if (feed.read) {
+        return true;
+      }
+      let index = feed.index;
       api.setRead(this.type, { index }).then((res) => {
-        feed.read = true;
+        if (res.success) {
+          feed.read = true;
+          this.decreaseRefer(this.type);
+        }
       });
     },
 
     replyLinker(feed) {
       return '/article/' + feed.board + '/' + feed.group_id + "#pos" + feed.pos;
     },
+
+    ...mapActions([
+      'decreaseRefer'
+    ])
 
   }
 }
