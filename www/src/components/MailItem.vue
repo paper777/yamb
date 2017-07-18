@@ -6,8 +6,9 @@
         <h4 class="title is-4"
             v-bind:class="{ notRead: !read , hasRead: read}">
           {{ title }}
-          <!-- The num here is for debugging -->
+          <!-- The num here is for debugging
           <span class="num is-pulled-right">{{ num }}</span>
+          -->
         </h4>
 
         <div class="inscribe">
@@ -37,6 +38,9 @@
 </script>
 
 <style scoped>
+  .box {
+    border-radius: 0;
+  }
   .inscribe {
     color: #ccc;
   }

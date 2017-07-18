@@ -34,7 +34,6 @@
             </div>
           </div>
           <div class="article-body content"  v-html="mainPost.content"> </div>
-          <hr>
         </div>
         <div class="oops" v-else>
           // TODO threads without header
@@ -44,7 +43,10 @@
 
 
         <div class="popular-replies" v-show="currentPage == 1 && popularReplies.length">
-          <span class="tag is-danger reply-tag">精彩回复</span> 
+          <div class="reply-tag">
+            <span class="tag is-danger">精彩回复</span> 
+            <b></b>
+          </div>
           <div class="post" v-for="(article, index) in popularReplies" :key="index">
             <div class="poster media">
               <figure class="media-left">
@@ -68,12 +70,15 @@
               </div>
             </div>
             <div class="article-body content" v-html="article.content"> </div>
-            <hr>
+            <hr v-if="index < popularReplies.length - 1">
           </div>
         </div>
 
         <div class="posts">
-          <span class="tag is-primary reply-tag" v-show="currentPage == 1 && posts.length">全部回复</span>
+          <div class="reply-tag">
+            <span class="tag is-primary" v-show="currentPage == 1 && posts.length">全部回复</span>
+            <b></b>
+          </div>
           <div class="post" v-for="(article, index) in posts" :key="index">
             <div class="poster media">
               <figure class="media-left">
@@ -102,7 +107,7 @@
         </div>
       </div>
     </section>
-    <section class="paginate" v-show="! isLoading && totalPage > 1">
+    <section class="paginate" v-if="! isLoading && totalPage > 1">
       <div class="card">
         <header class="columns is-mobile">
           <div class="column">
@@ -272,6 +277,14 @@ h4 {
     margin: 1px;
 }
 .reply-tag {
-    margin: 4px 0;
+    margin: 16px 0;
+}
+.reply-tag b {
+    display: inline-block;
+    height: 1px;
+    width: 79%;
+    background: #ddd;
+    float: right;
+    margin-top: 13px;
 }
 </style>

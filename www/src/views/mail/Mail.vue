@@ -47,7 +47,8 @@
 </script>
 
 <style scoped>
-  .tabs {
-    margin-bottom: 8px;
-  }
+.tabs {
+    margin-bottom: 0;
+    background-color: #fff;
+}
 </style>

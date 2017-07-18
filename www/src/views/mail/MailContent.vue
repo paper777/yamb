@@ -319,9 +319,6 @@
           if (! res.success) {
             return false;
           }
-          if (! res.data) {
-            return false;
-          }
           this.closeModal();
           this.showNotification("回复成功");
         });
@@ -372,11 +369,12 @@
 
 <style scoped>
   .mail {
-    padding-left: 15px;
-    padding-right: 15px;
+    padding: 16px 16px;
+    background-color: #fff;
   }
   .mail-inscribe {
     color: #aaa;
+    margin: 8px 0;
   }
   .notification {
     width: 100%;
