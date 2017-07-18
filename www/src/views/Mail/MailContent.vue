@@ -156,7 +156,7 @@
 
 <script>
   import * as api from 'api/mail'
-  import fab from 'components/fab'
+  import fab from 'components/FAB'
 
   export default {
     data() {

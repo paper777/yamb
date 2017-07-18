@@ -1,12 +1,13 @@
 // see http://vuejs-templates.github.io/webpack for documentation.
 var path = require('path')
+const assetsSubDirectory = 'yamb';
 
 module.exports = {
   build: {
     env: require('./prod.env'),
     index: path.resolve(__dirname, '../dist/index.html'),
     assetsRoot: path.resolve(__dirname, '../dist'),
-    assetsSubDirectory: 'static',
+    assetsSubDirectory: assetsSubDirectory,
     assetsPublicPath: '/',
     productionSourceMap: true,
     // Gzip off by default as many popular static hosts such as
