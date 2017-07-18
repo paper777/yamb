@@ -5,15 +5,15 @@
       <div> </div> <div> </div> <div> </div>
     </div>
 
-    <div v-for="(feed, index) in feeds" class="feeds">
-      
-      <feed 
+    <div v-for="(feed, index) in feeds" @click="setRead(feed)">
+      <feed
         :key="index"
         :linker="replyLinker(feed)"
         :title="feed.title"
         :desciption="feed.content"
         :author="feed.user"
         :board="feed.board"
+        :backgroundColor="feed.read ? 'white' : 'grey'"
         :attachment="feed.attachment ? feed.attachment : false">
       </feed>
     </div>
@@ -21,13 +21,14 @@
   </section>
 </template>
 <script>
-import * as api from 'api/home'
+import * as api from 'api/refer'
 import Feed from 'components/Feed'
 
 export default {
   data () {
     return {
       isLoading: true,
+      type: '',
       feeds: []
     }
   },
@@ -37,31 +38,33 @@ export default {
   },
 
   created() {
-    this.fetchReply(this.page);
+    let route = this.$route;
+    this.type = route.name;
+    this.fetchRefer(this.page);
   },
 
   methods: {
-    fetchReply(page) {
+    fetchRefer(page) {
       this.isLoading = true;
-      // this.isButtonLoading = 'is-loading';
-      api.getReply({ page }).then((res) => {
+      api.getRefer(this.type, { page }).then((res) => {
         if (! res.success) {
-          console.log("Get reply list failed! Please try again!")
           return false;
         }
 
-        console.log(res.data.article);
         this.feeds = this.feeds.concat(res.data.article);
         this.isLoading = false;
-        this.isButtonLoading = '';
-        console.log(res.data);
       });
     },
-    // console.log(res.data);
+
+    setRead(feed) {
+      let index = feed.index
+      api.setRead(this.type, { index }).then((res) => {
+        feed.read = true;
+      });
+    },
 
     replyLinker(feed) {
-        console.log(feed.id);
-      return "/refer/reply/"+ feed.id;
+      return '/article/' + feed.board + '/' + feed.group_id + "#pos" + feed.pos;
     },
 
   }

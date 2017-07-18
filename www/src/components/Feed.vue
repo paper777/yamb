@@ -1,7 +1,7 @@
 <template>
   <router-link target="_blank" :to="linker" class="main">
-    <section class="feed box">
-      <div class="feed-content ">
+    <section :class="'feed box ' + backgroundColor">
+      <div class="feed-content">
         <div class="content">
           <h4 class="title is-4">
             <slot name="header">
@@ -35,7 +35,8 @@
       'author',
       'board',
       'attachment',
-      'linker'
+      'linker',
+      'backgroundColor'
     ]
   }
 </script>
@@ -50,6 +51,14 @@
 
 .feed-content .author {
     color: #ccc;
+}
+
+.grey {
+    background-color: #f2f2f5;
+}
+
+.white {
+    background-color: #fff;
 }
 
 
