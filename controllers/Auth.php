@@ -22,6 +22,25 @@ class AuthController extends NF_YambController {
         load("inc/wrapper");
         $wrapper = Wrapper::getInstance();
         $data = $wrapper->user($u);
+
+        if (! c('refer.enable')) {
+            return $this->success($data);
+        }
+
+        load('model/refer');
+        try {
+            if ($u->getCustom('userdefine1', 2)) {
+                $refer = new Refer($u, Refer::$AT);
+                $data['new_at'] = $refer->getNewNum();
+            }
+            if ($u->getCustom('userdefine1', 3)) {
+                $refer = new Refer($u, Refer::$REPLY);
+                $data['new_reply'] = $refer->getNewNum();
+            }         
+        } catch (ReferNullException $e) {
+            // pass
+        }
+
         return $this->success($data);
     }
 
