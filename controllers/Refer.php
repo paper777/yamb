@@ -32,15 +32,62 @@ class ReferController extends NF_YambController {
 
         $info = [];
         foreach($articles as $v) {
-            $info[] = [
+            $data = [
                 "index" => $v['INDEX'],
                 "id" => $v['ID'],
+                "group_id" => $v['GROUP_ID'],
                 "board" => $v['BOARD'],
                 "user" => $v['USER'],
                 "title" => nforum_html($v['TITLE']),
                 "time" => $this->formatTime($v['TIME']),
                 "read" => ($v['FLAG'] === Refer::$FLAG_READ)
             ];
+
+            try {
+                load(['model/threads', 'model/board', 'model/board']);
+                $threads = Threads::getInstance($v['GROUP_ID'], Board::getInstance($v['BOARD']));
+                $article = $threads->getArticleById((int) $v['ID']);
+            } catch (Exception $e) {
+                continue;
+
+            }
+
+            if ($article == null) {
+                $data['content'] = false;
+                $data['pos'] = -1;
+            }
+
+            $data['pos'] = $article->getPos();
+
+            $content = $article->getPlant();
+            $content = preg_replace("/&nbsp;/", " ", $content);
+            $content = preg_replace("/  /", "&nbsp;&nbsp;", $content);
+
+            // get source
+            preg_match("|※ 来源:(.*)FROM:.*|", $content, $f);
+            $source = empty($f) ? "北邮人论坛" : $f[1];
+
+            // remove bottom lines
+            $s = (($pos = strpos($content, "<br/><br/>")) === false) ? 0 : $pos + 10;
+            $e = (($pos = strpos($content, "<br/>--<br/>")) === false) 
+                ? strlen($content)
+                : $pos + 7;
+            $content = preg_replace(
+                array("'^(<br/>)+'", "|(<br/>)+--$|")
+                ,array("", "<br>--")
+                ,substr($content, $s, $e - $s)
+            );
+
+            // parse attachments
+            $content = $article->parseAtt($content, 'middle');
+            if(c("ubb.parse")) {
+                load('inc/ubb');
+                $content = XUBB::parse($content);
+            }
+
+            $data['content'] = $content;
+            $info[] = $data;
+            unset($data);
         }
         $article = $info;
         return $this->success(compact('article', 'pagination', 'description'));
@@ -77,61 +124,7 @@ class ReferController extends NF_YambController {
             return $this->fail('refer not found');
         } 
         $refer->setRead($index);
-        $data = [
-            'index' => $r['INDEX'],
-            'id' => $r['ID'],
-            'group_id' => $r['GROUP_ID'],
-            'reply_id' => $r['RE_ID'],
-            'board_name' => $r['BOARD'],
-            'is_read' => true,
-            'time' => $this->formatTime($r['TIME']),
-            'title' => $r['TITLE'],
-        ];
-
-        try {
-            load(['model/threads', 'model/board', 'model/board']);
-            $threads = Threads::getInstance($r['GROUP_ID'], Board::getInstance($r['BOARD']));
-            $article = $threads->getArticleById((int) $r['ID']);
-            
-        } catch (Exception $e) {
-            return $this->fail('operation failed');
-        }
-
-        if ($article == null) {
-            $data['content'] = false;
-            $data['pos'] = -1;
-        }
-
-        $data['pos'] = $article->getPos();
-
-        $content = $article->getPlant();
-        $content = preg_replace("/&nbsp;/", " ", $content);
-        $content = preg_replace("/  /", "&nbsp;&nbsp;", $content);
-
-        // get source
-        preg_match("|※ 来源:(.*)FROM:.*|", $content, $f);
-        $source = empty($f) ? "北邮人论坛" : $f[1];
-
-        // remove bottom lines
-        $s = (($pos = strpos($content, "<br/><br/>")) === false) ? 0 : $pos + 10;
-        $e = (($pos = strpos($content, "<br/>--<br/>")) === false) 
-           ? strlen($content)
-           : $pos + 7;
-        $content = preg_replace(
-            array("'^(<br/>)+'", "|(<br/>)+--$|")
-            ,array("", "<br>--")
-            ,substr($content, $s, $e - $s)
-        );
-
-        // parse attachments
-        $content = $article->parseAtt($content, 'middle');
-        if(c("ubb.parse")) {
-            load('inc/ubb');
-            $content = XUBB::parse($content);
-        }
-
-        $data['content'] = $content;
-        return $this->success($data);
+        return $this->success(true);
     }
 
     public function deleteAction() {
