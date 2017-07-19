@@ -55,6 +55,7 @@ class ReferController extends NF_YambController {
             if ($article == null) {
                 $data['content'] = false;
                 $data['pos'] = -1;
+                continue;
             }
 
             $data['pos'] = $article->getPos();
