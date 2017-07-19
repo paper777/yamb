@@ -30,9 +30,9 @@ module.exports = {
     assetsPublicPath: '/',
       proxyTable: {
           '/n/b/**': {
-              target: 'http://10.3.18.65:80/',
+              target: 'http://m.also777.com/',
               pathRewrite: {
-                  '/n/b': '/paper/nforum/n/b'
+                  '/n/b': '/n/b'
               },
               cookieDomainRewrite: '',
               changeOrigin: true
