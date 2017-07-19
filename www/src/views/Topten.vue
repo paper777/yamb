@@ -6,7 +6,7 @@
   <div v-for="(feed, index) in topTen" class="feeds">
     <feed 
       :key="index"
-      linker="jumpToArticle(feed)"
+      :linker="jumpToArticle(feed)"
       :title="feed.title"
       :desciption="feed.content"
       :author="feed.user.id"
