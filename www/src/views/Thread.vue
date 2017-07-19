@@ -3,7 +3,7 @@
     <div class="page-loading loader-inner ball-pulse" v-if="isLoading">
       <div> </div> <div> </div> <div> </div>
     </div>
-    <section class="thread" v-show="! isLoading">
+    <section class="thread" v-if="! isLoading">
       <div class="container">
         <div class="thread-header" v-show="currentPage == 1">
           <h2>{{ title }}</h2>
@@ -18,7 +18,7 @@
           <hr>
         </div>
 
-        <div v-if="mainPost" class="article" v-show="currentPage == 1">
+        <div v-if="mainPost && currentPage == 1" class="article">
           <div class="poster media">
             <figure class="media-left">
               <p class="image is-32x32"> <img :src="mainPost.poster.face_url"> </p>
@@ -42,7 +42,7 @@
         </div>
 
 
-        <div class="popular-replies" v-show="currentPage == 1 && popularReplies.length">
+        <div class="popular-replies" v-if="currentPage == 1 && popularReplies.length">
           <div class="reply-tag">
             <span class="tag is-danger">精彩回复</span> 
             <b></b>
@@ -75,7 +75,7 @@
         </div>
 
         <div class="posts">
-          <div class="reply-tag" v-show="currentPage == 1 && posts.length">
+          <div class="reply-tag" v-if="currentPage == 1 && posts.length">
             <span class="tag is-primary">全部回复</span>
             <b></b>
           </div>
