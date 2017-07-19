@@ -147,5 +147,8 @@ span.role {
 .icon-message3 {
     color: #ffc716;
 }
+image {
+  width: auto;
+}
 
 </style>

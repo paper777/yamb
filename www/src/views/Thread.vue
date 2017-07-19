@@ -75,8 +75,8 @@
         </div>
 
         <div class="posts">
-          <div class="reply-tag">
-            <span class="tag is-primary" v-show="currentPage == 1 && posts.length">全部回复</span>
+          <div class="reply-tag" v-show="currentPage == 1 && posts.length">
+            <span class="tag is-primary">全部回复</span>
             <b></b>
           </div>
           <div class="post" v-for="(article, index) in posts" :key="index">
@@ -111,7 +111,7 @@
       <div class="card">
         <header class="columns is-mobile">
           <div class="column">
-            <a v-if="! mainPost.voted" @click="voteup(mainPost, -1)">顶 {{ mainPost.voteup_count }}</a>
+            <a v-if="mainPost && ! mainPost.voted" @click="voteup(mainPost, -1)">顶 {{ mainPost.voteup_count }}</a>
             <a v-else>顶 {{ mainPost.voteup_count }}</a>
           </div>
           <div class="column">

@@ -6,7 +6,7 @@
   <div v-for="(feed, index) in topTen" class="feeds">
     <feed 
       :key="index"
-      linker="/"
+      linker="jumpToArticle(feed)"
       :title="feed.title"
       :desciption="feed.content"
       :author="feed.user.id"
@@ -48,6 +48,10 @@ export default {
         this.topTen = res.data;
         this.isLoading = false;
       });
+    },
+
+    jumpToArticle(feed) {
+      return '/article/' + feed.board_name + '/' + feed.group_id;
     }
   }
 }
