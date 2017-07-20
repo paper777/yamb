@@ -3,7 +3,7 @@
     <div class="page-loading loader-inner ball-pulse" v-if="isLoading">
       <div> </div> <div> </div> <div> </div>
     </div>
-    <section class="thread" v-if="! isLoading">
+    <section class="thread" v-show="! isLoading">
       <div class="container">
         <div class="thread-header" v-show="currentPage == 1">
           <h2>{{ title }}</h2>
@@ -35,7 +35,7 @@
           </div>
           <div class="article-body content"  v-html="mainPost.content"> </div>
         </div>
-        <div class="oops" v-else>
+        <div class="oops" v-else-if="! mainPost">
           // TODO threads without header
           // CONTRIBUTING: https://github.com/paper777/yamb
           <hr>

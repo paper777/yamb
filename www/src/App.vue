@@ -22,6 +22,12 @@ export default {
 @import '~normalize.css/normalize.css';
 @import '~bulma/css/bulma.css';
 @import '~loaders.css/loaders.min.css';
+html {
+    height: 100%;
+}
+body {
+    height: 100%;
+}
 .app-main {
     background-color: #f7f8fa;
 }
