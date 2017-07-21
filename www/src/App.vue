@@ -23,10 +23,10 @@ export default {
 @import '~bulma/css/bulma.css';
 @import '~loaders.css/loaders.min.css';
 html {
-    height: 100%;
+  overflow-x: visible;
 }
 body {
-    height: 100%;
+  overflow-x: visible;
 }
 .app-main {
     background-color: #f7f8fa;

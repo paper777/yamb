@@ -37,7 +37,8 @@
         </div>
         <div class="oops" v-else-if="! mainPost">
           // TODO threads without header
-          // CONTRIBUTING: https://github.com/paper777/yamb
+          <br>
+          // CONTRIBUTING: <a href="https://github.com/paper777/yamb">Go To Github Page</a>
           <hr>
         </div>
 
@@ -109,7 +110,7 @@
     </section>
     <section class="paginate" v-if="! isLoading && totalPage > 1">
       <div class="card">
-        <header class="columns is-mobile">
+        <header class="columns is-mobile paginate-items">
           <div class="column">
             <a v-if="mainPost && ! mainPost.voted" @click="voteup(mainPost, -1)">顶 {{ mainPost.voteup_count }}</a>
             <a v-else>顶 {{ mainPost.voteup_count }}</a>
@@ -275,6 +276,10 @@ h4 {
 .paginate {
     text-align: center;
     margin: 1px;
+}
+.paginate-items {
+  margin-left: 0;
+  margin-right: 0;
 }
 .reply-tag {
     margin: 16px 0;
