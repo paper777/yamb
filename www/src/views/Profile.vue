@@ -55,6 +55,9 @@
     <div class="refer box" @click="$router.push('/mail/inbox')">
       <i class="iconfont icon-message"></i>
       <span> 收件箱 </span>
+      <span class="tag is-warning" v-if="profile.new_mail">新</span>
+      <span class="tag is-danger" v-if="profile.full_mail">满</span>
+
     </div>
   </div>
 

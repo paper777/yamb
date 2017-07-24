@@ -1,7 +1,7 @@
 <?php
 class AuthController extends NF_YambController {
 
-    public function loginAction() { 
+    public function loginAction() {
         if (! $this->getRequest()->isPost()) {
             $this->abort();
         }
@@ -40,6 +40,11 @@ class AuthController extends NF_YambController {
         } catch (ReferNullException $e) {
             // pass
         }
+
+        load("model/mail");
+        $info = MailBox::getInfo($u);
+        $data['new_mail'] = $info['newmail'];
+        $data['full_mail'] = $info['full'];
 
         return $this->success($data);
     }
