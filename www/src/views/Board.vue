@@ -35,7 +35,7 @@
     </div>
     <section class="paginate" v-show="! isLoading && totalPage > 1">
       <div class="card">
-        <header class="columns is-mobile">
+        <header class="columns is-mobile paginate-items">
           <div class="column">
             <a @click="getPrevPage">上一页</a>
           </div>
@@ -153,6 +153,9 @@ margin: 18px 0 18px 0;
     text-align: center;
     margin: 1px;
 }
-
+.paginate-items {
+  margin-left: 0;
+  margin-right: 0;
+}
 </style>
 

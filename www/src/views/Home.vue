@@ -35,7 +35,9 @@ export default {
 
   created() {
     let activeTab = this.$route.name;
-    
+    if (activeTab == 'home') {
+      return this.$router.push('/home/topten');
+    }
     this.changeTab(activeTab);
   },
 
@@ -50,7 +52,7 @@ export default {
         } else {
           this.navActived[key] = false;
         }
-      }  
+      }
     },
 
     navClicked(item) {
@@ -58,7 +60,6 @@ export default {
       this.$router.push('/home/' + item);
     }
   }
-  
 }
 </script>
 

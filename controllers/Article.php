@@ -1,5 +1,4 @@
 <?php
-load('model/article');
 class ArticleController extends NF_YambController {
 
     /**
@@ -10,8 +9,9 @@ class ArticleController extends NF_YambController {
     private $board;
 
     public function init() {
+        load('model/article');
         parent::init();
-        
+
         if (! isset($this->params['name'])) {
             $this->abort();
         }

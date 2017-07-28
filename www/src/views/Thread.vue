@@ -207,6 +207,7 @@ export default {
         } else {
           this.posts = data.articles;
         }
+        document.title = this.title + ' -北邮人论坛';
         this.cachePosts[page] = this.posts;
         document.body.scrollTop = document.documentElement.scrollTop = 0;
         this.isLoading = false;

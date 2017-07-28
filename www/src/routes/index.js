@@ -73,13 +73,19 @@ const router = new VueRouter({
     {
       name: 'board',
       path: '/board/:board/',
-      component: Board
+      component: Board,
+      meta: {
+        requireLogin: true
+      }
     },
 
     {
       name: 'mail',
       path: '/mail',
       component: Mail,
+      meta: {
+        requireLogin: true
+      },
       children: [
         {
           name: 'mailContent',
@@ -97,13 +103,19 @@ const router = new VueRouter({
     {
       name: 'reply',
       path: '/reply',
-      component: Refer
+      component: Refer,
+      meta: {
+        requireLogin: true
+      }
     },
 
     {
       name: 'at',
       path: '/at',
-      component: Refer
+      component: Refer,
+      meta: {
+        requireLogin: true
+      }
     },
 
     {

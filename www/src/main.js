@@ -12,7 +12,7 @@ import store from './store'
 require('./assets/animate.min.css');
 require('./assets/icon.css');
 
-Vue.prototype.$http = Axios
+Vue.prototype.$http = Axios;
 Vue.prototype.$http.defaults.headers.common = {
     'X-Requested-With': 'XMLHttpRequest'
 };

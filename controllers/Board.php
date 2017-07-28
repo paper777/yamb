@@ -5,6 +5,7 @@ class BoardController extends NF_YambController {
 
     public function init(){
         parent::init();
+        $this->requestLogin();
         if (isset($this->params['name'])) {
             $bName = trim($this->params['name']);
         } else {
