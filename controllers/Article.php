@@ -8,6 +8,10 @@ class ArticleController extends NF_YambController {
      */
     private $board;
 
+    private $fromType = 2;
+
+    private $tex = 0;
+
     public function init() {
         load('model/article');
         parent::init();
@@ -25,7 +29,7 @@ class ArticleController extends NF_YambController {
         }
 
         if (! $this->board->hasReadPerm(User::getInstance())) {
-            $this->fail('å•Šå‘€ï¼Œæ²¡æœ‰æƒé™å‘ƒ');
+            $this->fail('°¡Ñ½£¬Ã»ÓĞÈ¨ÏŞßÀ');
         }
 
         $this->board->setOnBoard();
@@ -58,8 +62,8 @@ class ArticleController extends NF_YambController {
             $content = preg_replace("/  /", "&nbsp;&nbsp;", $content);
 
             // get source
-            preg_match("|â€» æ¥æº:(.*)FROM:.*|", $content, $f);
-            $source = empty($f) ? "åŒ—é‚®äººè®ºå›" : $f[1];
+            preg_match("|¡ù À´Ô´:(.*)FROM:.*|", $content, $f);
+            $source = empty($f) ? "±±ÓÊÈËÂÛÌ³" : $f[1];
 
             // remove bottom lines
             $s = (($pos = strpos($content, "<br/><br/>")) === false) ? 0 : $pos + 10;
@@ -239,13 +243,111 @@ class ArticleController extends NF_YambController {
         // modify user socre
         try {
             $poster = User::getInstance($article->OWNER);
-            $user->modifyScore(c("article.like_sub") * -1, 'ä¸ºç”¨æˆ· ' . $poster->userid . ' ç‚¹èµ ' . $bname . 'ç‰ˆ ä¸»é¢˜å¸–ID:' . $gid);
-            $poster->modifyScore(c("article.like_add"), 'ç”¨æˆ· ' . $user->userid  . ' ä¸ºä½ ç‚¹èµ ' . $bname . 'ç‰ˆ ä¸»é¢˜å¸–ID:' . $gid);
+            $user->modifyScore(c("article.like_sub") * -1, 'ÎªÓÃ»§ ' . $poster->userid . ' µãÔŞ ' . $bname . '°æ Ö÷ÌâÌûID:' . $gid);
+            $poster->modifyScore(c("article.like_add"), 'ÓÃ»§ ' . $user->userid  . ' ÎªÄãµãÔŞ ' . $bname . '°æ Ö÷ÌâÌûID:' . $gid);
         } catch(UserNullException $e) {
             return $this-fail('failed');
         }
 
         return $this->success(['count' => $sum]);
+    }
+
+    //public function prepostAction() {
+    //    if ($this->board->isReadOnly()) {
+    //        return  $this->fail('Ö»¶Á°æÃæ');
+    //    }
+    //    if (! $this->board->hasPostPerm(User::getInstance())) { 
+    //        return  $this->fail('È±ÉÙÈ¨ÏŞ');
+    //    }
+
+    //    if (isset($this->params['gid'])) {
+    //        if ($this->board->isNoReply()) {
+    //            return $this->fail('°æÃæ²»¿É»Ø¸´');
+    //        }
+
+    //        $reID = (int) $this->params['gid'];
+    //        try {
+    //            $article = Article::getInstance($reID, $this->board);
+    //        } catch(ArticleNullException $e) {
+    //            return $this->fail('Ä¿±êÌûÎ´ÕÒµ½');
+    //        }
+    //        if ($article->isNoRe()) {
+    //            return $this->fail('Ä¿±êÌû²»¿É»Ø¸´');
+    //        }
+    //    } else {
+    //        if($this->board->isTmplPost()) {
+    //            return $this->fail('°æÃæ½öÏŞÄ£°å·¢Ìû');
+    //        }
+    //        $reID = 0;
+    //    }
+    //}
+
+    public function postAction() {
+        if(! $this->getRequest()->isPost()) {
+            return $this->abort();
+        }
+
+        if ($this->board->isReadOnly()) {
+            return  $this->fail('Ö»¶Á°æÃæ');
+        }
+        if (! $this->board->hasPostPerm(User::getInstance())) { 
+            return  $this->fail('È±ÉÙÈ¨ÏŞ');
+        }
+
+        $article = false;
+        // reply mode
+        if (isset($this->params['gid'])) {
+            if ($this->board->isNoReply()) {
+                return $this->fail('°æÃæ²»¿É»Ø¸´');
+            }
+
+            $reID = (int) $this->params['gid'];
+            try {
+                $article = Article::getInstance($reID, $this->board);
+            } catch(ArticleNullException $e) {
+                return $this->fail('Ä¿±êÌûÎ´ÕÒµ½');
+            }
+            if ($article->isNoRe()) {
+                return $this->fail('Ä¿±êÌû²»¿É»Ø¸´');
+            }
+        } else {
+            if($this->board->isTmplPost()) {
+                return $this->fail('°æÃæ½öÏŞÄ£°å·¢Ìû');
+            }
+            $reID = 0;
+        }
+
+        if(empty($this->params['form']['subject'])) {
+            return $this->fail('±êÌâ²»ÄÜÎª¿Õ');
+        }
+        if(empty($this->params['form']['content'])) {
+            return $this->fail('ÄÚÈİ²»ÄÜÎª¿Õ');
+        }
+
+        $subject = trim($this->params['form']['subject']);
+        $content = trim($this->params['form']['content']);
+        $subject = nforum_iconv($this->encoding, 'GBK', $subject);
+        $content = nforum_iconv($this->encoding, 'GBK', $content);
+            
+        //$subject = rawurldecode($subject);
+        $sig = User::getInstance()->signature;
+        $email = 0; $anony = null; $outgo = 0;
+        if (isset($this->params['form']['anony']) && $this->board->isAnony()) {
+            $anony = 1;
+        }
+        if (isset($this->params['form']['outgo']) && $this->board->isOutgo()) {
+            $outgo = 1;
+        }
+        try {
+            if (false === $article) { // new post
+                Article::post($this->board, $subject, $content, $sig, $email, $anony, $outgo, $this->tex, $this->fromType);
+            } else { // reply
+                $article->reply($subject, $content, $sig, $email, $anony, $outgo, $this->tex, $this->fromType);
+            }
+        } catch(ArticlePostException $e) {
+            return $this->fail('²Ù×÷Ê§°Ü');
+        }
+        return $this->success();
     }
 
 }

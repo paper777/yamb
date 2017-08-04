@@ -49,11 +49,14 @@
       </div>
     </section>
 
+    <float-button @click.native="newPost()"></float-button>
+
   </div>
 </template>
 
 <script>
 import * as api from 'api/board'
+import FloatButton from 'components/FloatButton';
 
 export default {
   data () {
@@ -77,6 +80,10 @@ export default {
       posts: [],
       cachedPages: {}
     }
+  },
+
+  components: {
+    FloatButton
   },
 
   created() {
@@ -130,8 +137,13 @@ export default {
       }
       this.currentPage ++;
       this.fetchBoards();
-    }
+    },
 
+    newPost() {
+      let url = `/post?type=new&board=${this.query.board}`;
+      console.log(url);
+      this.$router.push(url);
+    }
   }
 }
 </script>

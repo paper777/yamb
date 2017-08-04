@@ -18,6 +18,8 @@ import MailContent from 'views/Mail/MailContent'
 
 import Refer from 'views/Refer'
 
+import Post from 'views/Post'
+
 import store from 'store'
 
 
@@ -80,6 +82,15 @@ const router = new VueRouter({
     },
 
     {
+      name: 'post',
+      path: '/post',
+      component: Post,
+      meta: {
+        requireLogin: true
+      }
+    },
+
+    {
       name: 'mail',
       path: '/mail',
       component: Mail,
@@ -115,6 +126,14 @@ const router = new VueRouter({
       component: Refer,
       meta: {
         requireLogin: true
+      }
+    },
+
+    {
+      name: '404',
+      path: '/404',
+      component: {
+        template: '<div> 啊，这是哪儿？</div>'
       }
     },
 

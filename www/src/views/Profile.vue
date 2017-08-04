@@ -17,10 +17,10 @@
             <div class="items">
               <p class="subtitle is-6"> {{ profile.user_name }} </p>
               <p class="subtitle is-6">
-                <i class="iconfont role icon-role" aria-hidden="true"></i>
+                <i class="iconfont role icon-account" aria-hidden="true"></i>
                 <span class="role">{{ profile.role }}</span>
-                <i v-if="profile.gender == 'm'" class="iconfont icon-gender_boy" aria-hidden="true"></i>
-                <i v-else class="iconfont icon-gender_girl" aria-hidden="true"></i>
+                <i v-if="profile.gender == 'm'" class="iconfont icon-male" aria-hidden="true"></i>
+                <i v-else class="iconfont icon-female" aria-hidden="true"></i>
               </p>
             </div>
           </div>
@@ -45,15 +45,15 @@
 
   <div class="pannel-box" v-show="! isLoading">
     <div class="mail box" @click="$router.push('/reply')">
-      <i class="iconfont icon-message1"></i>
+      <i class="iconfont icon-remind"></i>&nbsp;
       <span> 回复我的 </span><span class="tag is-warning" v-if="profile.new_reply">{{ profile.new_reply }}</span>
     </div>
     <div class="reply box" @click="$router.push('/at')">
-      <i class="iconfont icon-message3"></i>
-      <span> @我的 </span><span class="tag is-warning" v-if="profile.new_at">{{ profile.new_at }}</span>
+      <i class="iconfont icon-at"></i>&nbsp;
+      <span> 提到我的 </span><span class="tag is-warning" v-if="profile.new_at">{{ profile.new_at }}</span>
     </div>
     <div class="refer box" @click="$router.push('/mail/inbox')">
-      <i class="iconfont icon-message"></i>
+      <i class="iconfont icon-email"></i>&nbsp;
       <span> 收件箱 </span>
       <span class="tag is-warning" v-if="profile.new_mail">新</span>
       <span class="tag is-danger" v-if="profile.full_mail">满</span>

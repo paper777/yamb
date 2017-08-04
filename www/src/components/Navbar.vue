@@ -11,7 +11,7 @@
         <div class="nav-center">
           <div class="nav-item">
             <!--
-            <i class="iconfont icon-search"></i>
+            <a @click="search">search</a>
             -->
           </div>
         </div>

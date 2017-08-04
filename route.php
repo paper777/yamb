@@ -17,6 +17,9 @@ $export[] = array($api . '/user/query/:username', array('controller' => 'user', 
 $export[] = array($api . '/article/:name/:action/:gid', array('controller' => 'article', 'module' => 'yamb', 'action' => null), array('gid' => '\d+'));
 $export[] = array($api . '/article/:name/:action', array('controller' => 'article', 'module' => 'yamb'));
 
+// attachement
+$export[] = array($api . '/attachment/:name/:action/:id', array('controller' => 'attachment', 'module' => 'yamb', 'action' => null, 'id' => null), array('id' => '\d+'));
+
 /** board */
 $export[] = array($api . '/board/:name', array('controller' => 'board', 'module' => 'yamb'));
 
