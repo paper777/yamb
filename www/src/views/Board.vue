@@ -198,7 +198,11 @@ hr {
 .top-post > p {
     display: inline-block;
     margin-left: .3rem;
-
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 250px;
+    overflow: hidden;
+    vertical-align: bottom;
 }
 .top-post .more {
     float: right;

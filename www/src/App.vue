@@ -28,6 +28,9 @@ html {
 body {
   overflow-x: visible;
 }
+.title {
+    font-weight: 400;
+}
 .app-main {
     background-color: #f7f8fa;
 }
