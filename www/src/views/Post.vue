@@ -6,14 +6,14 @@
       <header class="columns is-mobile">
         <div class="column is-2"> <i class="iconfont icon icon-smile" @click="expandSmileBox()"></i>
         </div>
-        <div class="column is-2 file-field">
+        <div class="column is-2 file-field" v-if="attachment">
             <i class="iconfont icon icon-img"></i>
               <input type="file" accept="image/*" name="attachment" id="attachment">
         </div>
         <div class="column is-2">
           <i @click="insertMention()" class="iconfont icon icon-at"></i>
         </div>
-        <div class="column is-2 is-offset-5 post-button">
+        <div class="column is-2 post-button" :class="attachment ? 'is-offset-5' : 'is-offset-7'">
           <a @click="post()">发表</a>
         </div>
       </header>
@@ -33,7 +33,7 @@
         </figure>
       </div>
     </section>
-    <section class="upload-box" v-if="showUploadBox">
+    <section class="upload-box" v-if="attachment && showUploadBox">
 
       <div class="upload-item" v-for="(item, index) in uploadItems" :key="index" >
         <span :style="'background-image: url(' + item + ')'"></span>
@@ -66,7 +66,8 @@ export default {
   data () {
     return  {
       pageLoading: false,
-      type: 'new',
+      attachment: false,
+      type: 'new', // new article OR reply article OR edit article
       reid: null,
       board: '',
       reTitle: '',
@@ -121,13 +122,60 @@ export default {
       this.type = 'reply';
       this.reTitle = query.retitle ? decodeURIComponent(query.retitle) : '';
       this.title = "Re: " + this.reTitle;
+    } else if (query.type == 'edit') {
+      this.type == 'edit';
     } else {
       this.type = 'new';
     }
   },
 
   mounted() {
-    this.bindUploadEvent('attachment');
+    this.pageLoading = true;
+    switch (this.type) {
+    case 'reply':
+      api.preReply(this.board, this.reid).then((res) => {
+        this.pageLoading = false;
+        if (res.success) {
+          this.attachment = res.data.attachment;
+          if (this.attachment) {
+            this.$nextTick(() => {
+              this.bindUploadEvent('attachment');
+            });
+          }
+          return true;
+        }
+        this.$toast(res.message, {
+          callback: () => {
+            this.$router.go(-1);
+          }
+        });
+      });
+      break;
+
+    case 'edit':
+      break;
+
+    case 'new':
+      api.prePost(this.board).then((res) => {
+        this.pageLoading = false;
+        if (res.success) {
+          this.attachment = res.data.attachment;
+          if (this.attachment) {
+            this.$nextTick(() => {
+              this.bindUploadEvent('attachment');
+            });
+          }
+          return true;
+        }
+        this.$toast(res.message, {
+          callback: () => {
+            this.$router.go(-1);
+          }
+        });
+      });
+
+      break;
+    }
   },
 
   methods: {
@@ -203,6 +251,7 @@ export default {
       for (let i in this.files) {
         api.addAttachment(this.board, this.files[i]).then((response) => {
           if (! response.success) {
+            this.pageLoading = false;
             return this.$toast(response.message);
           }
           if (i == this.files.length - 1) {

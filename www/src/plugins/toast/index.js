@@ -4,12 +4,13 @@ const Toast = {
   install: (Vue, options = {}) => {
     let preset = {
       duration: 2400,
-      align: 'center'
+      align: 'center',
+      callback: null
     };
     Object.assign(preset, options);
 
     Vue.prototype.$toast = (message, options = {}) => {
-      Object(preset, options);
+      Object.assign(preset, options);
 
       const Tc = Vue.extend(ToastComponent);
       const instance = new Tc().$mount(document.createElement('div'));
@@ -23,6 +24,9 @@ const Toast = {
         instance.visible = false;
         setTimeout(() => {
           document.body.removeChild(instance.$el);
+          if (preset.callback) {
+            preset.callback();
+          }
         }, 500);
       }, preset.duration);
     };

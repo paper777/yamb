@@ -252,35 +252,53 @@ class ArticleController extends NF_YambController {
         return $this->success(['count' => $sum]);
     }
 
-    //public function prepostAction() {
-    //    if ($this->board->isReadOnly()) {
-    //        return  $this->fail('只读版面');
-    //    }
-    //    if (! $this->board->hasPostPerm(User::getInstance())) { 
-    //        return  $this->fail('缺少权限');
-    //    }
+    public function prereplyAction() {
+        if ($this->board->isReadOnly()) {
+            return  $this->fail('只读版面');
+        }
+        if (! $this->board->hasPostPerm(User::getInstance())) { 
+            return  $this->fail('缺少权限或者未登录');
+        }
 
-    //    if (isset($this->params['gid'])) {
-    //        if ($this->board->isNoReply()) {
-    //            return $this->fail('版面不可回复');
-    //        }
+        if (empty($this->params['gid'])) {
+            return $this->fail('文章不存在');
+        }
 
-    //        $reID = (int) $this->params['gid'];
-    //        try {
-    //            $article = Article::getInstance($reID, $this->board);
-    //        } catch(ArticleNullException $e) {
-    //            return $this->fail('目标帖未找到');
-    //        }
-    //        if ($article->isNoRe()) {
-    //            return $this->fail('目标帖不可回复');
-    //        }
-    //    } else {
-    //        if($this->board->isTmplPost()) {
-    //            return $this->fail('版面仅限模板发帖');
-    //        }
-    //        $reID = 0;
-    //    }
-    //}
+        if ($this->board->isNoReply()) {
+            return $this->fail('只读版面');
+        }
+
+        $reID = (int) $this->params['gid'];
+        try {
+            $article = Article::getInstance($reID, $this->board);
+        } catch(ArticleNullException $e) {
+            return $this->fail('文章不存在');
+        }
+        if ($article->isNoRe()) {
+            return $this->fail('目标帖不可回复');
+        }
+        $data = [
+            'attachment' => $this->board->isAttach(),
+        ];
+        return $this->success($data);
+    }
+
+    public function prepostAction() {
+        if ($this->board->isReadOnly()) {
+            return  $this->fail('只读版面');
+        }
+        if (! $this->board->hasPostPerm(User::getInstance())) { 
+            return  $this->fail('缺少权限或者未登录');
+        }
+
+        if ($this->board->isTmplPost()) {
+            return $this->fail('版面仅限模板发帖');
+        }
+        $data = [
+            'attachment' => $this->board->isAttach(),
+        ];
+        return $this->success($data);
+    }
 
     public function postAction() {
         if(! $this->getRequest()->isPost()) {
@@ -298,7 +316,7 @@ class ArticleController extends NF_YambController {
         // reply mode
         if (isset($this->params['gid'])) {
             if ($this->board->isNoReply()) {
-                return $this->fail('版面不可回复');
+                return $this->fail('只读版面');
             }
 
             $reID = (int) $this->params['gid'];
@@ -311,16 +329,16 @@ class ArticleController extends NF_YambController {
                 return $this->fail('目标帖不可回复');
             }
         } else {
-            if($this->board->isTmplPost()) {
+            if ($this->board->isTmplPost()) {
                 return $this->fail('版面仅限模板发帖');
             }
             $reID = 0;
         }
 
-        if(empty($this->params['form']['subject'])) {
+        if (empty($this->params['form']['subject'])) {
             return $this->fail('标题不能为空');
         }
-        if(empty($this->params['form']['content'])) {
+        if (empty($this->params['form']['content'])) {
             return $this->fail('内容不能为空');
         }
 

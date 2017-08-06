@@ -22,3 +22,7 @@ export const deleteAttachment = (board, name, articleId = null) => {
 export const newArticle = (board, params = {}) => post(`article/${board}/post`, params);
 
 export const replyArticle = (board, article, params = {}) => post(`article/${board}/post/${article}`, params);
+
+export const preReply = (board, article, params = {}) => post(`article/${board}/prereply/${article}`, params);
+
+export const prePost = (board, params = {}) => post(`article/${board}/prepost`, params);
