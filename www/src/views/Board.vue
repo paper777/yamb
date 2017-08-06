@@ -11,6 +11,15 @@
           </content>
         </div>
       </div>
+      <div class="top-posts-section">
+        <div class="top-post" v-for="(post, index) in topPosts" :key="post.id" v-if="! index || showAllTopPosts">
+          <span class="tag is-warning" :class="index ? 'invisible' : 'visible'">置顶</span>
+          <p @click="getArticle(post.gid)"> <strong> {{ post.title }}</strong> </p>
+          <span @click="showAllTopPosts = showAllTopPosts ? false : true" v-if="! index" class="more">
+            <i class="icon iconfont" :class="showAllTopPosts ? 'icon-less' : 'icon-moreunfold'"></i>
+          </span>
+        </div>
+      </div>
       <div class="posts">
         <div class="post" v-for="(article, index) in posts" :key="index" @click="getArticle(article.gid)">
           <div class="poster media">
@@ -66,6 +75,7 @@ export default {
       },
 
       isLoading: true,
+      showAllTopPosts: false,
 
       // pagination
       currentPage: 1,
@@ -78,6 +88,7 @@ export default {
       description: '',
 
       posts: [],
+      topPosts: [],
       cachedPages: {}
     }
   },
@@ -112,7 +123,15 @@ export default {
         this.canPost = data.canPost;
         this.isAdmin = data.Admin;
         this.isBM = data.isBM;
-        this.posts = data.posts;
+
+        this.topPosts = []; this.posts = [];
+        for (let i in data.posts) {
+          if (data.posts[i].tag == 'top') {
+            this.topPosts.push(data.posts[i]);
+          } else {
+            this.posts.push(data.posts[i]);
+          }
+        }
 
         document.body.scrollTop = document.documentElement.scrollTop = 0;
         this.isLoading = false;
@@ -155,19 +174,41 @@ export default {
 }
 
 .board-description {
-  padding-bottom: 12px;
+    padding-bottom: 12px;
 }
 
 hr {
-margin: 18px 0 18px 0;
+    margin: 18px 0 18px 0;
 }
 .paginate {
     text-align: center;
     margin: 1px;
 }
 .paginate-items {
-  margin-left: 0;
-  margin-right: 0;
+    margin-left: 0;
+    margin-right: 0;
+}
+.top-posts-section {
+    background-color: whitesmoke;
+    margin-bottom: 12px;
+}
+.top-post {
+    padding: 4px 0;
+}
+.top-post > p {
+    display: inline-block;
+    margin-left: .3rem;
+
+}
+.top-post .more {
+    float: right;
+    color: #ff3860;
+}
+.visible {
+    opacity: 1;
+}
+.invisible {
+    opacity: 0;
 }
 </style>
 
