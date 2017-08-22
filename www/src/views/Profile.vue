@@ -141,15 +141,6 @@ span.role {
 .pannel-box .iconfont {
     font-size: large;
 }
-.icon-message1 {
-    color: #ffc716;
-}
-.icon-message {
-    color: #1296db;
-}
-.icon-message3 {
-    color: #ffc716;
-}
 img {
   width: auto;
 }

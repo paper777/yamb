@@ -21,11 +21,11 @@
         <div v-if="mainPost && currentPage == 1" class="article">
           <div class="poster media">
             <figure class="media-left">
-              <p class="image is-32x32"> <img :src="mainPost.poster.face_url"> </p>
+              <p @click="jumpToUser(mainPost)" class="image is-32x32"> <img :src="mainPost.poster.face_url"> </p>
             </figure>
             <div class="media-content">
               <div class="content">
-                <h4> {{ mainPost.poster.id }}</h4>
+                <h4 @click="jumpToUser(mainPost)" :class="[ mainPost.poster.gender == 'm' ? 'gender-m' : 'gender-f' ]"> {{ mainPost.poster.id }}</h4>
                 <small> <span>楼主</span> {{ mainPost.time }} </small>
               </div>
             </div>
@@ -61,11 +61,11 @@
           <div class="post" v-for="(article, index) in popularReplies" :key="index">
             <div class="poster media">
               <figure class="media-left">
-                <p class="image is-32x32"> <img :src="article.poster ? article.poster.face_url : ''"> </p>
+                <p @click="jumpToUser(article)" class="image is-32x32"> <img :src="article.poster ? article.poster.face_url : ''"> </p>
               </figure>
               <div class="media-content">
                 <div class="content">
-                  <h4> {{ article.poster ? article.poster.id : '已注销'}}</h4>
+                  <h4 @click="jumpToUser(article)" :class="[ article.poster ? (article.poster.gender == 'm' ? 'gender-m' : 'gender-f') : 'gender-u' ]"> {{ article.poster ? article.poster.id : '已注销'}}</h4>
                   <small>
                     <span>{{ article.pos == 1 ? '沙发' : (article.pos == 2 ? '板凳' : article.pos + '楼') }}</span>
                     {{ article.time }}
@@ -98,11 +98,11 @@
           <div class="post" v-for="(article, index) in posts" :key="index">
             <div class="poster media">
               <figure class="media-left">
-                <p class="image is-32x32"> <img :src="article.poster ? article.poster.face_url : ''"> </p>
+                <p @click="jumpToUser(article)" class="image is-32x32"> <img :src="article.poster ? article.poster.face_url : ''"> </p>
               </figure>
               <div class="media-content">
                 <div class="content">
-                  <h4> {{ article.poster ? article.poster.id : '已注销'}}</h4>
+                  <h4 @click="jumpToUser(article)" :class="[ article.poster ? (article.poster.gender == 'm' ? 'gender-m' : 'gender-f') : 'gender-u' ]"> {{ article.poster ? article.poster.id : '已注销'}}</h4>
                   <small>
                     <span>{{ article.pos == 1 ? '沙发' : article.pos == 2 ? '板凳' : article.pos +  '楼' }}</span>
                     {{ article.time }}
@@ -238,6 +238,12 @@ export default {
       this.$router.push('/board/' + name);
     },
 
+    jumpToUser(article) {
+      if (article.poster) {
+        this.$router.push('/user/' + article.poster.id);
+      }
+    },
+
     getPrevPage() {
       if (this.currentPage <= 1) {
         return false;
@@ -290,6 +296,12 @@ h4 {
 .poster.media {
     margin: 8px 0;
 }
+.gender-m {
+    color: #57e5d5;
+}
+.gender-f {
+    color: #ff6693;
+}
 .article-body.content {
     color: black;
 }
@@ -319,7 +331,7 @@ h4 {
 .media-right a {
     color: #4a4a4a;
 }
-.voted {
+voted {
     color: #00d1b2;
 }
 </style>

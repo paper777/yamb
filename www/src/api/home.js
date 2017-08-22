@@ -12,4 +12,6 @@ export const getReplyRead = (params = null) => get('refer/reply' , params)
 
 export const getProfile = (params = null) => get('user/profile', params)
 
+export const getUser = (id, params = null) => get('user/query/' + id, params)
+
 export const getFavBoards = (level, params = {}) => get(`fav/${level}`, params)

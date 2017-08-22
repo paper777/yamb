@@ -18,6 +18,8 @@ import MailContent from 'views/Mail/MailContent'
 
 import Refer from 'views/Refer'
 
+import User from 'views/User'
+
 import Post from 'views/Post'
 
 import store from 'store'
@@ -124,6 +126,15 @@ const router = new VueRouter({
       name: 'at',
       path: '/at',
       component: Refer,
+      meta: {
+        requireLogin: true
+      }
+    },
+
+    {
+      name: 'user',
+      path: '/user/:id',
+      component: User,
       meta: {
         requireLogin: true
       }
