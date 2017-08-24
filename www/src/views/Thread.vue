@@ -95,7 +95,7 @@
             <span class="tag is-primary">全部回复</span>
             <b></b>
           </div>
-          <div class="post" v-for="(article, index) in posts" :key="index">
+          <div class="post" :id="article.pos" v-for="(article, index) in posts" :key="index">
             <div class="poster media">
               <figure class="media-left">
                 <p @click="jumpToUser(article)" class="image is-32x32"> <img :src="article.poster ? article.poster.face_url : ''"> </p>
@@ -122,7 +122,7 @@
                 </span>
               </div>
             </div>
-            <div class="article-body content" v-html="article.content"> </div>
+            <div class="article-body content" v-html="article.content" :class="{ 'selected-content': article.pos == position, 'remove-selected': removeSelected }"> </div>
             <hr>
           </div>
         </div>
@@ -164,6 +164,8 @@ export default {
         id: ''
       },
 
+      position: 0,
+
       isLoading: true,
 
       title: '加载中...',
@@ -184,7 +186,9 @@ export default {
       mainPost: null,
       posts: [],
       popularReplies: [],
-      cachePosts: {}
+      cachePosts: {},
+
+      removeSelected: false
     }
   },
 
@@ -192,6 +196,16 @@ export default {
   },
 
   created() {
+    let location = this.$route.query;
+    if (location.page) {
+      this.currentPage = location.page;
+    }
+
+    if (location.pos) {
+      this.currentPage = parseInt(location.pos / 10) + 1;
+      this.position = location.pos;
+    }
+    
     this.query = this.$route.params;
     this.fetchArticles();
   },
@@ -211,26 +225,39 @@ export default {
         }
 
         const data = res.data;
-        if (page == 1) {
-          this.title = data.title;
-          this.time = data.time;
-          this.gid = data.gid;
-          this.board = data.board;
-          this.anony = data.anony;
-          this.popularReplies = data.popularReplies;
-          this.totalPage = data.pagination.total;
-          if (data.articles[0]['id'] == this.gid) {
-            [this.mainPost, ...this.posts] = data.articles;
-          } else {
-            this.posts = data.articles;
-          }
+        this.title = data.title;
+        this.time = data.time;
+        this.gid = data.gid;
+        this.board = data.board;
+        this.anony = data.anony;
+        this.popularReplies = data.popularReplies;
+        this.totalPage = data.pagination.total;
+        if (data.articles[0]['id'] == this.gid) {
+          [this.mainPost, ...this.posts] = data.articles;
         } else {
           this.posts = data.articles;
+          if (data.head && ! this.mainPost) {
+            this.mainPost = data.head;
+          }
         }
         document.title = this.title + ' -北邮人论坛';
         this.cachePosts[page] = this.posts;
         document.body.scrollTop = document.documentElement.scrollTop = 0;
         this.isLoading = false;
+
+        if (this.position > 0) {
+          this.$nextTick(() => {
+            let $dom = document.getElementById(this.position);
+            if (! $dom) {
+              return ;
+            }
+
+            $dom.scrollIntoView();
+            setTimeout(() => {
+              this.removeSelected = true;
+            }, 400)
+          });
+        } 
       });
     },
 
@@ -333,5 +360,11 @@ h4 {
 }
 voted {
     color: #00d1b2;
+}
+.selected-content {
+    background-color: #eaeaec;
+}
+.remove-selected {
+    background-color: #fff;
 }
 </style>

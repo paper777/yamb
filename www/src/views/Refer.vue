@@ -71,7 +71,7 @@ export default {
     },
 
     replyLinker(feed) {
-      return '/article/' + feed.board + '/' + feed.group_id + "#pos" + feed.pos;
+      return '/article/' + feed.board + '/' + feed.group_id + "?pos=" + feed.pos;
     },
 
     ...mapActions([
