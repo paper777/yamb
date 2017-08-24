@@ -152,11 +152,36 @@ class ArticleController extends NF_YambController {
                 try {
                     $data['poster'] = $wrapper->user(User::getInstance($article->OWNER));
                 } catch(Exception $e) {
-                    $data['poster'] = [ 'id' => $v->OWNER ];
+                    $data['poster'] = [ 'id' => $article->OWNER ];
                 }
 
                 $popularReplies[] = $data;
                 unset($popularReplies['linkesum']);
+            }
+        }
+
+        try {
+            $head = Article::getInstance($gid, $this->board);
+        } catch(ArticleNullException $e) {
+            $head = null;
+        }
+        if ($head) {
+            $db = DB::getInstance();
+            $likesum = $db->one('select count(*) as sum from dianzan_usr where articleid = ? and bname = ?',array($head->ID, $this->board->NAME));
+            $liked = $db->one('select count(*) as liked from dianzan_usr where articleid = ? and userid_like = ? and bname = ?',array($head->ID, $u->userid, $this->board->NAME));
+            $promed = $db->one('select flag from dianzan_stat where articleid = ? and bname = ?',array($head->ID, $this->board->NAME));
+
+            $main = [
+                "id" => $head->ID,
+                "time" => $this->formatTime($head->POSTTIME),
+                "voted" => $liked['liked'] ? true : false,
+                "promed" => $promed['flag'],
+                "voteup_count" => $likesum['sum']
+                ];
+            try {
+                $main['poster'] = $wrapper->user(User::getInstance($head->OWNER));
+            } catch(Exception $e) {
+                $main['poster'] = [ 'id' => $head->OWNER ];
             }
         }
 
@@ -168,6 +193,7 @@ class ArticleController extends NF_YambController {
             'title' => nforum_html($threads->TITLE),
             'board' => $wrapper->board($this->board),
             'articles' => $info,
+            'head' => $main,
             'popularReplies' => isset($popularReplies) ? $popularReplies : false,
             'pagination' => [
                 'current' => $pagination->getCurPage(),

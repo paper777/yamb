@@ -19,7 +19,7 @@ class FavController extends NF_YambController
         try {
             $favBoards = Favor::getInstance($this->level);
         } catch (FavorNullException $e) {
-            $this0>fail('内部错误');
+            $this->fail('内部错误');
         }
 
         $parent = $favBoards->getParent();
