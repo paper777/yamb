@@ -1,4 +1,4 @@
-# Introduction
+## Introduction
 
 Yamb is a module for [nforum](https://github.com/xw2423/nForum), a replacement of [Mobile Module](https://github.com/xw2423/nForum/tree/2.0/app/modules).
 
@@ -6,10 +6,10 @@ Yamb is a module for [nforum](https://github.com/xw2423/nForum), a replacement o
 Yamb is also a project for BYRs to learn front end programming
 -->
 
-@see https://bbs.byr.cn/n
+see https://bbs.byr.cn/n
 
 
-# Installation
+## Installation
 
 
 ``` bash
@@ -34,42 +34,52 @@ cd www && link -sf ../app/modules/Yamb/www/dist/yamb .
 
 ```
 
-# TODOs
+## TODOs
 
-## Thread(artticle) page
+### Thread(artticle) page
 
-* 1. quick reply
-* 2. rich text editor for replies and publishes
-* 3. forward article
-* 4. vote down
-* ...
+forward article
 
-## User profile page
+vote down
 
-* 1. basic profile page
-* 2. say hello (mail) to sb.
-* 3. add to friend list (optional)
-* ...
+...
 
+### User profile page
 
-## Boards & Sections
-* 1. add a board to favorite board list
-* 2. section list
-* ...
+say hello (mail) to sb.
+
+add to friend list (optional)
+
+...
 
 
-# Contributing
+### Boards & Sections
+
+section list
+
+add a board to favorite board list
+
+### Search
+
+board search
+
+article search (in a specific board)
+
+...
+
+
+## Contributing
 
 Thank you for considering contributing to the yamb module! 
 
 Any bugs just open an [issue](https://github.com/paper777/yamb/issues/new) or submit a PR
 
-## Front End Guide
+1. Front End Guide
 
 Clone the repo and run ```npm install && npm run dev```. 
 
 Back end api requests will be proxied to `http://m.also777.com (10.3.18.65)`, please ensure you are in BUPT Network(10.0.0.0/8).
 
-## Back End
+2. Back End
 
 connect paper777#qq(dot)com
