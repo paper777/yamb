@@ -60,27 +60,27 @@ class ReferController extends NF_YambController {
 
             $data['pos'] = $article->getPos();
 
-            $content = $article->getPlant();
-            $content = preg_replace("/&nbsp;/", " ", $content);
-            $content = preg_replace("/  /", "&nbsp;&nbsp;", $content);
+            $content = $article->getContent();
+            //$content = preg_replace("/&nbsp;/", " ", $content);
+            //$content = preg_replace("/  /", "&nbsp;&nbsp;", $content);
 
-            // get source
-            preg_match("|※ 来源:(.*)FROM:.*|", $content, $f);
-            $source = empty($f) ? "北邮人论坛" : $f[1];
+            //// get source
+            //preg_match("|※ 来源:(.*)FROM:.*|", $content, $f);
+            //$source = empty($f) ? "北邮人论坛" : $f[1];
 
-            // remove bottom lines
-            $s = (($pos = strpos($content, "<br/><br/>")) === false) ? 0 : $pos + 10;
-            $e = (($pos = strpos($content, "<br/>--<br/>")) === false) 
-                ? strlen($content)
-                : $pos + 7;
-            $content = preg_replace(
-                array("'^(<br/>)+'", "|(<br/>)+--$|")
-                ,array("", "<br>--")
-                ,substr($content, $s, $e - $s)
-            );
+            //// remove bottom lines
+            //$s = (($pos = strpos($content, "<br/><br/>")) === false) ? 0 : $pos + 10;
+            //$e = (($pos = strpos($content, "<br/>--<br/>")) === false) 
+            //    ? strlen($content)
+            //    : $pos + 7;
+            //$content = preg_replace(
+            //    array("'^(<br/>)+'", "|(<br/>)+--$|")
+            //    ,array("", "\n--")
+            //    ,substr($content, $s, $e - $s)
+            //);
 
-            // parse attachments
-            $content = $article->parseAtt($content, 'middle');
+            //// parse attachments
+            //$content = $article->parseAtt($content, 'middle');
             if(c("ubb.parse")) {
                 load('inc/ubb');
                 $content = XUBB::parse($content);

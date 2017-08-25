@@ -30,7 +30,7 @@ class BoardController extends NF_YambController {
 
     public function indexAction(){
         $u = User::getInstance();
-        $p = isset($this->params['url']['p']) ? $this->params['url']['p'] : 1;
+        $p = isset($this->params['url']['page']) ? $this->params['url']['page'] : 1;
         
         load('inc/pagination');
         try {
