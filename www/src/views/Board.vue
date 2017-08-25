@@ -14,30 +14,34 @@
       <div class="top-posts-section">
         <div class="top-post" v-for="(post, index) in topPosts" :key="post.id" v-if="! index || showAllTopPosts">
           <span class="tag is-warning" :class="index ? 'invisible' : 'visible'">置顶</span>
-          <p @click="getArticle(post.gid)"> <strong> {{ post.title }}</strong> </p>
+          <router-link target="_blank" :to="getArticle(post.gid)">
+            <p> <strong> {{ post.title }}</strong> </p>
+          </router-link>
           <span @click="showAllTopPosts = showAllTopPosts ? false : true" v-if="! index" class="more">
             <i class="icon iconfont" :class="showAllTopPosts ? 'icon-less' : 'icon-moreunfold'"></i>
           </span>
         </div>
       </div>
       <div class="posts">
-        <div class="post" v-for="(article, index) in posts" :key="index" @click="getArticle(article.gid)">
-          <div class="poster media">
-            <div class="media-content">
-              <div class="content">
-                <p> <strong> {{ article.title }}</strong> </p>
+        <div class="post" v-for="(article, index) in posts" :key="index">
+          <router-link target="_blank" :to="getArticle(article.gid)">
+            <div class="poster media">
+              <div class="media-content">
+                <div class="content">
+                  <p> <strong> {{ article.title }}</strong> </p>
+                </div>
+                <nav class="article-footer level is-mobile">
+                  <div class="level-left">
+                    <span class="level-item">{{ article.poster }}</span>
+                    <span class="level-item"> {{ article.replyTime }} 更新</span>
+                  </div>
+                  <div class="level-right">
+                    <span class="level-item"> {{ article.replyCount }} 人回复</span>
+                  </div>
+                </nav>
               </div>
-              <nav class="level is-mobile">
-                <div class="level-left">
-                  <span class="level-item">{{ article.poster }}</span>
-                  <span class="level-item"> {{ article.replyTime }} 更新</span>
-                </div>
-                <div class="level-right">
-                  <span class="level-item"> {{ article.replyCount }} 人回复</span>
-                </div>
-              </nav>
             </div>
-          </div>
+          </router-link>
           <hr>
         </div>
       </div>
@@ -139,7 +143,7 @@ export default {
     },
 
     getArticle(gid) {
-      this.$router.push(`/article/${this.name}/${gid}`);
+      return `/article/${this.name}/${gid}`;
     },
 
     getPrevPage() {
@@ -195,7 +199,8 @@ hr {
 .top-post {
     padding: 4px 0;
 }
-.top-post > p {
+.top-post p {
+    color: #4a4a4a;
     display: inline-block;
     margin-left: .3rem;
     white-space: nowrap;
@@ -213,6 +218,9 @@ hr {
 }
 .invisible {
     opacity: 0;
+}
+.article-footer {
+    color: #4a4a4a;
 }
 </style>
 

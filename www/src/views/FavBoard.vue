@@ -6,7 +6,7 @@
     <div class="bread-nav" v-if="parent >= 0">
       <a class="button is-info is-outlined is-small" @click="getParent()">返回</a>
     </div>
-    <div class="empty-tip" v-if="boards.length == 0">
+    <div class="empty-tip" v-if="! isLoading && boards.length == 0">
       <p class="subtitle is-6"> 收藏版面空空如也哦 </p>
     </div>
     <div class="columns is-multiline is-mobile is-gapless">

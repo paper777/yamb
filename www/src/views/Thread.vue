@@ -255,7 +255,7 @@ export default {
             $dom.scrollIntoView();
             setTimeout(() => {
               this.removeSelected = true;
-            }, 400)
+            }, 2000)
           });
         } 
       });
