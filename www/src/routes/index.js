@@ -22,6 +22,8 @@ import User from 'views/User'
 
 import Post from 'views/Post'
 
+import Contributor from 'views/Contributor'
+
 import store from 'store'
 
 
@@ -135,6 +137,15 @@ const router = new VueRouter({
       name: 'user',
       path: '/user/:id',
       component: User,
+      meta: {
+        requireLogin: true
+      }
+    },
+
+    {
+      name: 'contributor',
+      path: '/contributor',
+      component: Contributor,
       meta: {
         requireLogin: true
       }

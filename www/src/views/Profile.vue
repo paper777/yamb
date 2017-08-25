@@ -61,10 +61,18 @@
     </div>
   </div>
 
-  <div class="pannel-box" v-show="! isLoading">
-    <div class="refer box">
-      <i class="iconfont icon-setting"></i>
-      <span> 设置 </span>
+  <div class="pannel-box infomations" v-show="! isLoading">
+    <div class="box" @click="$router.push('/post?type=new&board=advice')">
+      <i class="iconfont icon-edit"></i>&nbsp;
+      <span>意见反馈</span>
+    </div>
+    <div class="box" @click="$router.push('/article/id/9272')">
+      <i class="iconfont icon-attachment"></i>&nbsp;
+      <span>论坛管理办法</span>
+    </div>
+    <div class="box" @click="$router.push('/contributor')">
+      <i class="iconfont icon-smile"></i>&nbsp;
+      <span> 特别感谢 </span>
     </div>
   </div>
 </section>
