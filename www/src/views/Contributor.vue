@@ -23,13 +23,12 @@ export default {
     return {
       contributors: [
         {
-
           id: 'D7474126',
-          work: '站内信 设计与编码',
+          work: '回复/艾特 设计与编码'
         },
         {
           id: 'raaay0608',
-          work: '回复/艾特 设计与编码'
+          work: '站内信 设计与编码',
         }
       ]
     }
@@ -37,7 +36,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .content {
     padding: 1rem;
 }
