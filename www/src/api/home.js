@@ -3,6 +3,7 @@ import { get, post } from './wrapper'
 export const getTopTen = (params = null) => get('topten', params)
 
 export const getTimeline = (params = null) => get('timeline', params)
+export const getBanners = (params = null) => get('banner', params)
 
 export const getReply = (params = null) => get('refer/reply' , params)
 

@@ -125,4 +125,24 @@ class HomeController extends NF_YambController {
         return $this->success(compact('parent', 'boards'));
     }
 
+    public function bannerAction() {
+        load('model/adv');
+        $res = Adv::getMobileBanner();
+
+        $banners = [];
+        $base = c('site.static');
+
+        foreach($res as $b) {
+            $banners[] = [
+                'image_url'=> $base . $b['file'],
+                'intro' => $b['remark'],
+                'url' => $b['url']
+            ];
+        }
+        $data = [
+            'banners' => $banners
+        ];
+        return $this->success($data);
+    }
+
 }

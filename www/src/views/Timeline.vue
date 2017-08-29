@@ -3,6 +3,9 @@
     <div class="page-loading loader-inner ball-pulse" v-if="isLoading">
       <div> </div> <div> </div> <div> </div>
     </div>
+    <div class="banner-field" v-show="! isLoading">
+      <slider :items="banners"></slider>
+    </div>
     <div v-for="(feed, index) in feeds" class="feeds">
       <feed
         :key="index"
@@ -24,6 +27,7 @@
 <script>
 import * as api from 'api/home'
 import Feed from 'components/Feed'
+import Slider from 'components/Slider'
 
 export default {
   data () {
@@ -31,19 +35,34 @@ export default {
       page: 1,
       isButtonLoading: '',
       isLoading: true,
+      banners: [],
       feeds: []
     }
   },
 
   components: {
-    Feed
+    Feed,
+    Slider
   },
 
   created() {
+    this.fetchBanners();
     this.fetchTimeline(this.page);
   },
 
+   mounted() {
+   },
+
   methods: {
+    fetchBanners() {
+      api.getBanners().then((res) => {
+        if (! res.success) {
+          return false;
+        }
+        this.banners = res.data.banners;
+      });
+    },
+
     fetchTimeline(page) {
       this.isLoading = true;
       this.isButtonLoading = 'is-loading';

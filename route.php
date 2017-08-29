@@ -6,6 +6,7 @@ $api = $base . '/b';
 /** home page */
 $export[] = array($api . '/topten', array('controller' => 'home', 'module' => 'yamb', 'action' => 'index'));
 $export[] = array($api . '/timeline', array('controller' => 'home', 'module' => 'yamb', 'action' => 'timeline'));
+$export[] = array($api . '/banner', array('controller' => 'home', 'module' => 'yamb', 'action' => 'banner'));
 $export[] = array($api . '/fav/:level', array('controller' => 'home', 'module' => 'yamb', 'action' => 'fav'));
 
 /** user */
