@@ -5,32 +5,28 @@
            width: `${width}px`,
            height: `${height}px`
            }">
-    <ul
-      class="slider"
-      :style="{
-             'animation-duration': `${items.length * hangonTime}s`
-             }">
-      <li class="item" v-for="(item, index) in items" @click="clickItem(item)">
+    <div class="slider" v-show="ready">
+      <div
+        class="item"
+        v-for="(item, index) in items"
+        :class="{
+               animating: isAnimating(index)
+               }"
+        :style="{
+               transform: `translateX(${ calculatetranslate(index) }px)`
+               }"
+        @click="clickItem(item)" >
         <figure>
-          <img
-            :src="item.image_url"
-            :style="{
-                  width: `${width}px`,
-                  height: `${height}px`
-                  }"/>
+          <img :src="item.image_url"/>
         </figure>
         <div class="focus-item"></div>
-      </li>
-    </ul>
+      </div>
+    </div>
+
     <div class="focus-item">
     <ul>
       <li v-for="(item, index) in items">
-        <div
-          :style="{
-                  'animation-duration': `${items.length * hangonTime}s`,
-                  'animation-delay': `${index * hangonTime}s`
-                  }">
-
+        <div :class="{ active: activeIndex == index }">
         </div>
       </li>
     </ul>
@@ -51,18 +47,57 @@
 
    data () {
      return {
-       hangonTime: 4,
+       ready: false,
        width: 0,
        height: 0,
+
+       activeIndex: 0,
+       oldActiveIndex: 0,
+
+       timer: 0,
+       interval: 3000
      }
    },
 
    mounted() {
      this.width = screen.width - 4;
      this.height = this.width * .25;
+     this.startTimer();
+   },
+
+   beforeDestroy() {
+     clearInterval(this.timer);
    },
 
    methods: {
+     startTimer() {
+       if (this.timer) return;
+       this.timer = setInterval(this.play, this.interval);
+       if (! this.ready) {
+         this.ready = true;
+       }
+     },
+
+     play() {
+       this.oldActiveIndex = this.activeIndex;
+       if (this.activeIndex < this.items.length - 1) {
+         this.activeIndex ++;
+       } else {
+         this.activeIndex = 0;
+       }
+     },
+
+     isAnimating(index) {
+       return index == this.activeIndex || index == this.oldActiveIndex;
+     },
+
+     calculatetranslate(index) {
+       if (Math.abs(this.activeIndex - index) == this.items.length - 1) {
+         return this.activeIndex > index ? this.width : -this.width;
+       }
+       return (index - this.activeIndex) * this.width;
+     },
+
      clickItem(item) {
        window.location.href = item.url;
      },
@@ -85,16 +120,19 @@
  ul {
    list-style: none;
  }
- .slider {
-   width: 300%;
-   height: 100%;
-   margin-left: 0;
-   animation-name: slide;
-   animation-timing-function: ease-out;
-   animation-iteration-count: infinite;
+ .slider img {
+   width: auto;
  }
  .item {
-   float: left;
+   width: 100%;
+   height: 100%;
+   position: absolute;
+   display: inline-block;
+   top: 0;
+   left: 0;
+ }
+ .animating {
+   transition: transform 0.4s ease-in-out;
  }
  .focus-item {
    position: absolute;
@@ -126,24 +164,7 @@
    animation-timing-function: linear;
    animation-iteration-count: infinite;
  }
-
- @-webkit-keyframes fade {
-  0%   { opacity: 1 }
-  23%  { opacity: 1 }
-  33%  { opacity: 0 }
-  56%  { opacity: 0 }
-  66%  { opacity: 0 }
-  90%  { opacity: 0 }
-  100% { opacity: 1 }
- }
-
- @-webkit-keyframes slide {
-   0% { margin-left: 0; }
-   23% { margin-left: 0; }
-   33% { margin-left: calc(-100%) }
-   56% { margin-left: calc(-100%) }
-   66% { margin-left: calc(-200%) }
-   90% { margin-left: calc(-200%) }
-   100% { margin-left: 0; }
+ .focus-item li .active {
+   opacity: 1;
  }
 </style>
