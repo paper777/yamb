@@ -13,7 +13,10 @@
                animating: isAnimating(index)
                }"
         :style="{
-               transform: `translateX(${ calculatetranslate(index) }px)`
+               transform: `translateX(${ calculatetranslate(index) }px)`,
+               '-webkit-transform': `translateX(${ calculatetranslate(index) }px)`,
+               '-moz-transform': `translateX(${ calculatetranslate(index) }px)`,
+               '-o-transform': `translateX(${ calculatetranslate(index) }px)`
                }"
         @click="clickItem(item)" >
         <figure>
@@ -133,6 +136,9 @@
  }
  .animating {
    transition: transform 0.4s ease-in-out;
+   -webkit-transition: transform 0.4s ease-in-out;
+   -moz-transition: transform 0.4s ease-in-out;
+   -o-transition: transform 0.4s ease-in-out;
  }
  .focus-item {
    position: absolute;
