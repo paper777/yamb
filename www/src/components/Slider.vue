@@ -10,7 +10,8 @@
         class="item"
         v-for="(item, index) in items"
         :class="{
-               animating: isAnimating(index)
+               animating: isAnimating(index),
+               active: index == activeIndex
                }"
         :style="{
                transform: `translateX(${ calculatetranslate(index) }px)`,
@@ -22,7 +23,6 @@
         <figure>
           <img :src="item.image_url"/>
         </figure>
-        <div class="focus-item"></div>
       </div>
     </div>
 
@@ -91,7 +91,7 @@
      },
 
      isAnimating(index) {
-       return index == this.activeIndex || index == this.oldActiveIndex;
+       return index == this.oldActiveIndex || index == this.activeIndex;
      },
 
      calculatetranslate(index) {
@@ -117,7 +117,7 @@
 <style scoped>
  .slider-section {
    margin: 2px;
-   overflow: hidden;
+   overflow-x: hidden;
    position: relative;
  }
  ul {
@@ -134,11 +134,13 @@
    top: 0;
    left: 0;
  }
+ .item.active {
+ }
  .animating {
    transition: transform 0.4s ease-in-out;
-   -webkit-transition: transform 0.4s ease-in-out;
-   -moz-transition: transform 0.4s ease-in-out;
-   -o-transition: transform 0.4s ease-in-out;
+   -webkit-transition: -webkit-transform 0.4s ease-in-out;
+   -moz-transition: -moz-transform 0.4s ease-in-out;
+   -o-transition: -o-transform 0.4s ease-in-out;
  }
  .focus-item {
    position: absolute;
