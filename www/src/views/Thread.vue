@@ -332,6 +332,17 @@ h4 {
 .article-body.content {
     color: black;
 }
+.content {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  word-break: break-word;
+
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
 
 .tread-header {
     height: 60px;
