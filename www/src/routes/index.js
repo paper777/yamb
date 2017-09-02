@@ -7,6 +7,7 @@ import Home from 'views/Home'
 import Auth from 'views/Auth'
 import Thread from 'views/Thread'
 import Board from 'views/Board'
+import Section from 'views/Section'
 import FavBoard from 'views/FavBoard'
 import Topten from 'views/Topten'
 import Profile from 'views/Profile'
@@ -49,6 +50,14 @@ const router = new VueRouter({
           name: 'fav',
           path: 'fav',
           component: FavBoard
+        },
+        {
+          name: 'section',
+          path: '/section',
+          component: Section,
+          meta: {
+            parent: 'fav'
+          }
         },
         {
           name: 'timeline',

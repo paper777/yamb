@@ -6,20 +6,34 @@
     <div class="bread-nav" v-if="parent >= 0">
       <a class="button is-info is-outlined is-small" @click="getParent()">返回</a>
     </div>
+
     <div class="empty-tip" v-if="! isLoading && boards.length == 0">
       <p class="subtitle is-6"> 收藏版面空空如也哦 </p>
     </div>
-    <div class="columns is-multiline is-mobile is-gapless">
-      <div v-for="(board, index) in boards" :key="board.name" class="column is-half">
-        <div class="card fav-board">
-          <div class="card-content">
-            <a @click="jumpToBoard(board)">
-            <p class="title is-6">{{ board.dir ? '[收藏目录]' : '' }} {{  board.desc }}</p>
-            <p v-if="! board.dir" class="sub-title is-8">今日{{ board.new }}个讨论</p>
+
+    <div class="columns is-multiline is-mobile is-gapless" v-if="! isLoading">
+      <div class="column is-half"> 
+        <div class="card fav-board"> 
+          <div class="card-content"> 
+            <a @click="jumpToSection">
+              <p class="title is-6">所有版面</p>
+              <p class="sub-title is-6">查找/添加收藏</p>
             </a>
           </div>
         </div>
       </div>
+
+      <div v-for="(board, index) in boards" :key="board.name" class="column is-half">
+        <div class="card fav-board">
+          <div class="card-content">
+            <a @click="jumpToBoard(board)">
+            <p class="title is-6">{{ board.dir ? '[目录]' : '' }} {{  board.desc }}</p>
+            <p class="sub-title is-6">今日{{ board.new }}个讨论</p>
+            </a>
+          </div>
+        </div>
+      </div>
+
     </div>
   </section>
 </template>
@@ -65,6 +79,10 @@ export default {
 
     },
 
+    jumpToSection() {
+      this.$router.push('/section');
+    },
+
     getParent() {
       this.level = this.parent;
       this.fetchBoards();
@@ -74,18 +92,26 @@ export default {
 }
 </script>
 <style scoped>
-.card-content {
-  padding: 8px 4px 8px 12px;
-}
-.empty-tip {
-    text-align: center;
-    margin: 48px 16px 0 16px;
-}
-.bread-nav {
-    margin: 0 0 8px 0;
-}
-.column.is-half {
-    padding: 0 1px 1px 0; 
-}
+ .fav-board {
+   height: 80px;
+   display: flex;
+   align-items: center;
+ }
+ .card-content {
+   padding: 0.5rem;
+   white-space: nowrap;
+   text-overflow: ellipsis;
+   overflow-x: hidden;
+ }
+ .empty-tip {
+   text-align: center;
+   margin: 48px 16px 0 16px;
+ }
+ .bread-nav {
+   margin: 0 0 8px 0;
+ }
+ .column.is-half {
+   padding: 0 1px 1px 0; 
+ }
 
 </style>

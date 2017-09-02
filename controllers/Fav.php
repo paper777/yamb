@@ -13,34 +13,50 @@ class FavController extends NF_YambController
         }
     }
 
-    public function indexAction() {
-        load("model/favor");
+    public function changeAction() {
+        if(!isset($this->params['form']['ac']) || !isset($this->params['form']['v']))
+            $this->fail('缺少参数');
 
-        try {
-            $favBoards = Favor::getInstance($this->level);
-        } catch (FavorNullException $e) {
+        load("model/favor");
+        $action = $this->params['form']['ac'];
+        $val = $this->params['form']['v'];
+        try{
+            $fav = Favor::getInstance($this->level);
+        }catch(FavorNullException $e){
             $this->fail('内部错误');
         }
+        if($val == "")
+            $this->fail('缺少参数');
 
-        $parent = $favBoards->getParent();
-        $parent = $parent ? $parent->getLevel() : -1;
-
-        $boards = [];
-        if ($favBoards->isNull()) {
-            return $this->success(compact('parent', 'boards'));
+        switch($action){
+            case "ab":
+                try{
+                    $val = Board::getInstance($val);
+                    if(!$fav->add($val, Favor::$BOARD))
+                        $this->fail('收藏失败');
+                }catch(Exception $e){
+                    $this->fail('版面不存在');
+                }
+                break;
+            case "ad":
+                if(!$fav->add(nforum_iconv("utf-8", $this->encoding, $val), Favor::$DIR))
+                    $this->fail('添加目录失败');
+                break;
+            case "db":
+                try{
+                    $val = Board::getInstance($val);
+                    if(!$fav->delete($val, Favor::$BOARD))
+                        $this->fail('取消收藏失败');
+                }catch(Exception $e){
+                    $this->fail('版面不存在');
+                }
+                break;
+            case "dd":
+                if(!$fav->delete($val, Favor::$DIR))
+                    $this->fail('删除目录失败');
+                break;
         }
 
-        $_boards = $favBoards->getAll();
-        foreach ($_boards as $key => $board) {
-            $boards[] = [
-                'name' => $board->NAME,
-                'desc' => $board->DESC,
-                'dir' => $board->isDir(),
-                'pos' => $board->NPOS,
-                'new' => $board->getTodayNum(),
-                'level' => $board->BID
-            ];
-        }
-        return $this->success(compact('parent', 'boards'));
+        return $this->success();
     }
 }

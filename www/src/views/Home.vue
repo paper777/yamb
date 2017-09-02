@@ -4,7 +4,7 @@
     <ul>
       <li :class="{ 'is-active': navActived.topten }"><a @click="navClicked('topten')">今日十大</a></li>
       <li :class="{ 'is-active': navActived.timeline }"><a @click="navClicked('timeline')">发现</a></li>
-      <li :class="{ 'is-active': navActived.fav }"><a @click="navClicked('fav')">收藏版面</a></li>
+      <li :class="{ 'is-active': navActived.fav }"><a @click="navClicked('fav')">版面</a></li>
       <li :class="{ 'is-active': navActived.profile }"><a @click="navClicked('profile')">我</a></li>
     </ul>
   </div>
@@ -29,12 +29,13 @@ export default {
 
   watch: {
     $route(to, from) {
-      this.changeTab(to.name);
+      let activeTab = to.meta.parent ? to.meta.parent : to.name;
+      this.changeTab(activeTab);
     }
   },
 
   created() {
-    let activeTab = this.$route.name;
+    let activeTab = this.$route.meta.parent ? this.$route.meta.parent : this.$route.name;
     if (activeTab == 'home') {
       return this.$router.push('/home/topten');
     }
