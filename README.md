@@ -8,6 +8,9 @@ Yamb is also a project for BYRs to learn front end programming
 
 see https://bbs.byr.cn/n
 
+![yamb-screenshot](http://ovnevollz.bkt.clouddn.com/yamb-screenshot.png)
+
+
 
 ## Installation
 
@@ -53,15 +56,7 @@ add to friend list (optional)
 ...
 
 
-### Boards & Sections
-
-section list
-
-add a board to favorite board list
-
 ### Search
-
-board search
 
 article search (in a specific board)
 
