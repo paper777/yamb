@@ -16,6 +16,7 @@ import Timeline from 'views/Timeline'
 import Mail from 'views/Mail/Mail'
 import MailList from 'views/Mail/MailList'
 import MailContent from 'views/Mail/MailContent'
+import MailSend from 'views/Mail/MailSend'
 
 import Refer from 'views/Refer'
 
@@ -112,9 +113,14 @@ const router = new VueRouter({
       },
       children: [
         {
+          name: 'mailReply',
+          path: 'reply',
+          component: MailSend
+        },
+        {
           name: 'mailContent',
           path: ':type/show/:num',
-          component: MailContent,
+          component: MailContent
         },
         {
           name: 'mailList',
