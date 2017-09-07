@@ -14,11 +14,10 @@ class SectionController extends NF_YambController
         try {
             $favBoards = Favor::getInstance(0);
         } catch (FavorNullException $e) {
-            $this->fail('å†…éƒ¨é”™è¯¯');
+            $this->fail('ÄÚ²¿´íÎó');
         }
         $favs = $favBoards->getAllBoards();
 
-        $this->notice = "è®¨è®ºåŒºåˆ—è¡¨";
         $secs = c("section");
         foreach($secs as $k=>$v){
             $t = array(
@@ -47,7 +46,7 @@ class SectionController extends NF_YambController
         try {
             $favBoards = Favor::getInstance(0);
         } catch (FavorNullException $e) {
-            $this->fail('å†…éƒ¨é”™è¯¯');
+            $this->fail('ÄÚ²¿´íÎó');
         }
         $favs = $favBoards->getAllBoards();
         $name = trim($this->params['name']);
@@ -84,7 +83,7 @@ class SectionController extends NF_YambController
 
     private function findBoardsByRecursion($id, $depth, $favs = array()) {
         $ret = array();
-        try{
+        try {
             $sec = Section::getInstance($id, Section::$ALL);
             $brds = $sec->getAll();
             $sub_sections = array();

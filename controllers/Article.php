@@ -394,4 +394,101 @@ class ArticleController extends NF_YambController {
         return $this->success();
     }
 
+    public function preditAction() {
+        if ($this->board->isReadOnly()) {
+            return  $this->fail('只读版面');
+        }
+
+        if ($this->board->isNoReply()) {
+            return $this->fail('只读版面');
+        }
+
+        if (! $this->board->hasPostPerm(User::getInstance())) { 
+            return  $this->fail('缺少权限');
+        }
+
+        $article = false;
+        // reply mode
+        if (! isset($this->params['gid'])) {
+            return $this->fail('未知的帖子');
+        }
+
+        $gid = (int) $this->params['gid'];
+        try {
+            $article = Article::getInstance($gid, $this->board);
+        } catch(ArticleNullException $e) {
+            return $this->fail('目标帖未找到');
+        }
+
+        if ($article->isNoRe()) {
+            return $this->fail('目标帖不可回复');
+        }
+
+        if (! $article->hasEditPerm(User::getInstance())) {
+            return $this->fail('无编辑权限');
+        }
+
+        $atts = $article->getAttList();
+        foreach ($atts as &$att) {
+            $iconv = nforum_iconv($this->encoding, 'GBK', $att['name']);
+            if ($iconv !== false) {
+                $att['name'] = $iconv;
+            }
+        }
+
+        return $this->success([
+            'title' => $article->TITLE,
+            'content' => $article->getContent(),
+            'attachment' => $this->board->isAttach(),
+            'attachments' => $atts
+        ]);
+    }
+
+    public function editAction() {
+        if (! $this->getRequest()->isPost()) {
+            $this->abort();
+        }
+        if ($this->board->isReadOnly()) {
+            return  $this->fail('只读版面');
+        }
+
+        if ($this->board->isNoReply()) {
+            return $this->fail('只读版面');
+        }
+
+        if (! $this->board->hasPostPerm(User::getInstance())) { 
+            return  $this->fail('缺少权限');
+        }
+
+        $article = false;
+        // reply mode
+        if (! isset($this->params['gid'])) {
+            return $this->fail('未知的帖子');
+        }
+
+        $gid = (int) $this->params['gid'];
+        try {
+            $article = Article::getInstance($gid, $this->board);
+        } catch(ArticleNullException $e) {
+            return $this->fail('目标帖未找到');
+        }
+
+        if ($article->isNoRe()) {
+            return $this->fail('目标帖不可回复');
+        }
+
+        if (! $article->hasEditPerm(User::getInstance())) {
+            return $this->fail('无编辑权限');
+        }       
+
+        $subject = trim($this->params['form']['subject']);
+        $content = trim($this->params['form']['content']);
+        $subject = nforum_iconv($this->encoding, 'GBK', $subject);
+        $content = nforum_iconv($this->encoding, 'GBK', $content);
+        if (! $article->update($subject, $content)) {
+            return $this->fail('操作失败');
+        }
+
+        return $this->success();
+    }
 }

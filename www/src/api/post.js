@@ -16,13 +16,12 @@ export const deleteAttachment = (board, name, articleId = null) => {
   }
 
   return post(url, { name });
-
 };
 
 export const newArticle = (board, params = {}) => post(`article/${board}/post`, params);
-
-export const replyArticle = (board, article, params = {}) => post(`article/${board}/post/${article}`, params);
-
-export const preReply = (board, article, params = {}) => post(`article/${board}/prereply/${article}`, params);
+export const replyArticle = (board, id, params = {}) => post(`article/${board}/post/${id}`, params);
+export const editArticle = (board, id, params = {}) => post(`article/${board}/edit/${id}`, params);
 
 export const prePost = (board, params = {}) => post(`article/${board}/prepost`, params);
+export const preReply = (board, id, params = {}) => post(`article/${board}/prereply/${id}`, params);
+export const getEdit = (board, id, params = {}) => get(`article/${board}/predit/${id}`, params);

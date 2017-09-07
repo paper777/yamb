@@ -11,10 +11,10 @@
       <p class="subtitle is-6"> 收藏版面空空如也哦 </p>
     </div>
 
-    <div class="columns is-multiline is-mobile is-gapless" v-if="! isLoading">
-      <div class="column is-half"> 
-        <div class="card fav-board"> 
-          <div class="card-content"> 
+    <div class="columns is-multiline is-mobile is-gapless" v-if="! isLoading" @click="jumpToBoard(board)">
+      <div class="column is-half" v-if="level == 0">
+        <div class="card fav-board">
+          <div class="card-content">
             <a @click="jumpToSection">
               <p class="title is-6">所有版面</p>
               <p class="sub-title is-6">查找/添加收藏</p>
@@ -23,10 +23,10 @@
         </div>
       </div>
 
-      <div v-for="(board, index) in boards" :key="board.name" class="column is-half">
+      <div v-for="(board, index) in boards" :key="board.desc + board.level" class="column is-half" @click="jumpToBoard(board)">
         <div class="card fav-board">
           <div class="card-content">
-            <a @click="jumpToBoard(board)">
+            <a>
             <p class="title is-6">{{ board.dir ? '[目录]' : '' }} {{  board.desc }}</p>
             <p class="sub-title is-6">今日{{ board.new }}个讨论</p>
             </a>
@@ -59,7 +59,7 @@ export default {
       this.isLoading = true;
       api.getFavBoards(this.level).then((res) => {
         if (! res.success) {
-          // TODO
+          this.$toast(res.message);
           return false;
         }
         const data = res.data;
@@ -76,7 +76,6 @@ export default {
 
       this.level = board.level;
       this.fetchBoards();
-
     },
 
     jumpToSection() {

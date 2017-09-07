@@ -43,7 +43,7 @@ class AttachmentController extends NF_YambController
 
         $isFile = false;
         if (isset($this->params['id'])) {
-            $id = $tis->params['id'];
+            $id = $this->params['id'];
             try {
                 $article = Article::getInstance($id, $this->board);
                 if (! $article->hasEditPerm($u)) {
@@ -78,12 +78,13 @@ class AttachmentController extends NF_YambController
         case UPLOAD_ERR_OK:
             $tmpFile = $this->params['form']['file']['tmp_name'];
             $tmpName = $this->params['form']['file']['name'];
+            $tmpName = nforum_iconv($this->encoding, 'GBK', $tmpName);
             if (! is_uploaded_file($tmpFile)) {
                 $msg = '附件不存在';
                 break;
             }
             if (($totalSize + filesize($tmpFile)) > (int) $upload['att_size']) {
-                $msg = ECode::$ATT_SLIMIT;
+                $msg = '附件大小超过限制';
                 break;
             }
             try {
@@ -127,6 +128,7 @@ class AttachmentController extends NF_YambController
         }
 
         $attName = strval($this->params['form']['name']);
+        $attName = nforum_iconv($this->encoding, 'GBK', $attName);
         if (isset($this->params['id'])) {
             $id = $this->params['id'];
             try {
@@ -138,15 +140,30 @@ class AttachmentController extends NF_YambController
                 return $this->fail('文章不可编辑');
             }
 
-            $attNum = 0;
-            // find the att
-            foreach ($article->getAttList() as $k => $v) {
-                if($v['name'] == $attName) {
-                    $attNum = intval($k + 1);
-                    break;
+            $try = 0;
+            do {
+                $attNum = 0;
+                // find the att
+                foreach ($article->getAttList() as $k => $v) {
+                    if($v['name'] == $attName) {
+                        $attNum = intval($k + 1);
+                        break;
+                    }
                 }
+
+                try {
+                    $article->delAttach($attNum);
+                } catch (Exception $e) {
+                    $try ++;
+                    $attName = nforum_iconv('GBK', $this->encoding, $attName);
+                    continue;
+                }
+                break;
+            } while ($try <= 1);
+
+            if ($try > 1) {
+                return $this->fail('操作失败');
             }
-            $article->delAttach($attNum);
             return $this->success();
         }
 

@@ -67,10 +67,23 @@ export default {
     return  {
       pageLoading: false,
       attachment: false,
+      attachmentSize: 0,
       type: 'new', // new article OR reply article OR edit article
-      reid: null,
+
       board: '',
+
+      // reply
+      reid: null,
       reTitle: '',
+
+      // edit
+      id: null,
+      originalAttachments: [],
+      deletedAttachments: [],
+
+      attachInputBinded: false,
+      attachInput2Binded: false,
+
 
       title: '',
       content: '',
@@ -123,7 +136,8 @@ export default {
       this.reTitle = query.retitle ? decodeURIComponent(query.retitle) : '';
       this.title = "Re: " + this.reTitle;
     } else if (query.type == 'edit') {
-      this.type == 'edit';
+      this.type = 'edit';
+      this.id = query.id;
     } else {
       this.type = 'new';
     }
@@ -139,7 +153,10 @@ export default {
           this.attachment = res.data.attachment;
           if (this.attachment) {
             this.$nextTick(() => {
-              this.bindUploadEvent('attachment');
+              if (! this.attachInputBinded) {
+                this.bindUploadEvent('attachment');
+                this.attachInputBinded = true;
+              }
             });
           }
           return true;
@@ -153,6 +170,41 @@ export default {
       break;
 
     case 'edit':
+      api.getEdit(this.board, this.id).then((res) => {
+        this.pageLoading = false;
+        if (! res.success) {
+          return this.$toast(res.message, {
+            callback: () => {
+              this.$router.go(-1);
+            }
+          });
+        }
+
+        this.title = res.data.title;
+        this.content = res.data.content;
+        if (res.data.attachments.length) {
+          this.originalAttachments = res.data.attachments;
+          res.data.attachments.forEach((item) => {
+            this.uploadItems.push(`/att/${this.board}/${this.id}/${item.pos}`);
+            this.attachmentSize += item.size;
+          });
+        }
+        if (res.data.attachment) {
+          this.attachment = true;
+          this.$nextTick(() => {
+            if (! this.attachInputBinded) {
+              this.bindUploadEvent('attachment');
+              this.attachInputBinded = true;
+            }
+            if (! this.attachInput2Binded) {
+              this.bindUploadEvent('attachment2');
+              this.attachInput2Binded = true;
+            }
+          });
+
+        }
+      });
+
       break;
 
     case 'new':
@@ -162,7 +214,10 @@ export default {
           this.attachment = res.data.attachment;
           if (this.attachment) {
             this.$nextTick(() => {
-              this.bindUploadEvent('attachment');
+              if (! this.attachInputBinded) {
+                this.bindUploadEvent('attachment');
+                this.attachInputBinded = true;
+              }
             });
           }
           return true;
@@ -192,25 +247,33 @@ export default {
           this.uploadItems.push(reader.result);
           this.insertImage();
           if (this.uploadItems.length == 1) {
-            this.bindUploadEvent('attachment2');
+            if (! this.attachInput2Binded) {
+              this.bindUploadEvent('attachment2');
+              this.attachInput2Binded = true;
+            }
           }
           this.showUploadLoader = false;
         }
 
         const file = $file.files[0];
-        if (file.size > 5242880) {
+        if (! file) {
+          return false;
+        }
+
+        if (this.attachmentSize + file.size > 5242880) {
           this.$toast('图片大小不能超过5Mb');
           return false;
         }
+
         if (this.uploadItems.length >= 20) {
           this.$toast('附件数量不能超过20个');
           return false;
         }
-        if (file) {
-          this.files.push(file);
-          this.showUploadLoader = true;
-          reader.readAsDataURL(file);
-        }
+
+        this.attachmentSize += file.size;
+        this.files.push(file);
+        this.showUploadLoader = true;
+        reader.readAsDataURL(file);
       }, true);
 
     },
@@ -237,25 +300,59 @@ export default {
 
     removeImage(index) {
       let tag = `[upload=${index + 1}][/upload]`;
+      let url = this.uploadItems[index];
       this.uploadItems.splice(index, 1);
-      this.files.splice(index, 1);
+      if (! url.startsWith('/att')) {
+        this.files.splice(index, 1);
+      } else {
+        let pos = url.split('/').pop()
+        for (let i in this.originalAttachments) {
+          if (this.originalAttachments[i].pos == pos) {
+            this.deletedAttachments.push(this.originalAttachments[i]['name']);
+          }
+        }
+      }
       this.content = this.content.replace(tag, '');
     },
 
     post() {
       this.pageLoading = true;
-      if (this.files.length == 0) {
-        this.postArticle();
+
+      let addAtt = () => {
+        for (let i in this.files) {
+          api.addAttachment(this.board, this.files[i], this.id ? this.id : null).then((response) => {
+            if (! response.success) {
+              this.pageLoading = false;
+              return this.$toast(response.message);
+            }
+            if (i == this.files.length - 1) {
+              this.postArticle();
+            }
+          });
+        }
+      };
+
+      if (! this.deletedAttachments.length) {
+        if (this.files.length == 0) {
+          this.postArticle();
+        } else {
+          addAtt();
+        }
         return true;
       }
-      for (let i in this.files) {
-        api.addAttachment(this.board, this.files[i]).then((response) => {
+
+      for (let i in this.deletedAttachments) {
+        api.deleteAttachment(this.board, this.deletedAttachments[i], this.id).then((response) => {
           if (! response.success) {
             this.pageLoading = false;
             return this.$toast(response.message);
           }
-          if (i == this.files.length - 1) {
-            this.postArticle();
+          if (i == this.deletedAttachments.length - 1) {
+            if (this.files.length == 0) {
+              this.postArticle();
+            } else {
+              addAtt();
+            }
           }
         });
       }
@@ -266,26 +363,45 @@ export default {
         subject: this.title,
         content: this.content
       };
-      if (this.reid) {
-        api.replyArticle(this.board, this.reid, data).then((response) => {
-          this.pageLoading = false;
-          if (response.success) {
-            return this.$router.go(-1);
-          }
-          this.$toast(response.message);
-        });
-        return true;
+      switch (this.type) {
+        case 'new':
+          api.newArticle(this.board, data).then((response) => {
+            this.pageLoading = false;
+            if (response.success) {
+              this.pageLoading = false;
+              return this.$router.go(-1);
+            }
+            this.$toast(response.message);
+          });
+          break;
+
+        case 'reply':
+          api.replyArticle(this.board, this.reid, data).then((response) => {
+            this.pageLoading = false;
+            if (response.success) {
+              this.pageLoading = false;
+              return this.$router.go(-1);
+            }
+            this.$toast(response.message);
+          });
+          break;
+
+        case 'edit':
+          api.editArticle(this.board, this.id, data).then((response) => {
+            this.pageLoading = false;
+            if (response.success) {
+              this.pageLoading = false;
+              return this.$router.go(-1);
+            }
+            this.$toast(response.message);
+          });
+
+          break;
+
+        default: break;
       }
 
-      api.newArticle(this.board, data).then((response) => {
-        this.pageLoading = false;
-        if (response.success) {
-          this.pageLoading = false;
-          return this.$router.go(-1);
-        }
-        this.$toast(response.message);
-      });
-
+      return true;
     }
   }
 }

@@ -31,6 +31,9 @@
             </div>
             <div class="media-right">
               <span>
+                <a v-if="mainPost.op" @click="edit(mainPost)"><i class="iconfont icon-edit"></i></a>
+              </span>
+              <span>
                 <a @click="reply(mainPost)"><i class="iconfont icon-comments"></i></a>
               </span>
               <span>
@@ -73,6 +76,9 @@
                 </div>
               </div>
               <div class="media-right">
+              <span>
+                <a v-if="mainPost.op" @click="edit(mainPost)"><i class="iconfont icon-edit"></i></a>
+              </span>
                 <span>
                   <a @click="reply(mainPost)"><i class="iconfont icon-comments"></i></a>
                 </span>
@@ -111,7 +117,10 @@
               </div>
               <div class="media-right">
                 <span>
-                  <a @click="reply(mainPost)"><i class="iconfont icon-comments"></i></a>
+                  <a v-if="mainPost.op" @click="edit(article)"><i class="iconfont icon-edit"></i></a>
+                </span>
+                <span>
+                  <a @click="reply(article)"><i class="iconfont icon-comments"></i></a>
                 </span>
                 <span>
                   <a v-if="! article.voted" @click="voteup(article, index)">
@@ -300,6 +309,11 @@ export default {
         }
         this.posts[index] = article;
       });
+    },
+
+    edit(article) {
+      let url = `type=edit&id=${article.id}&board=${this.board.name}`;
+      this.$router.push('/post?' + url);
     },
 
     reply(article) {
