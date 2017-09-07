@@ -11,11 +11,11 @@
       <p class="subtitle is-6"> 收藏版面空空如也哦 </p>
     </div>
 
-    <div class="columns is-multiline is-mobile is-gapless" v-if="! isLoading" @click="jumpToBoard(board)">
-      <div class="column is-half" v-if="level == 0">
+    <div class="columns is-multiline is-mobile is-gapless" v-if="! isLoading">
+      <div class="column is-half" v-if="level == 0" @click="jumpToSection()">
         <div class="card fav-board">
           <div class="card-content">
-            <a @click="jumpToSection">
+            <a>
               <p class="title is-6">所有版面</p>
               <p class="sub-title is-6">查找/添加收藏</p>
             </a>

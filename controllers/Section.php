@@ -9,6 +9,13 @@ class SectionController extends NF_YambController
 
 
     public function indexAction() {
+        $boards = nforum_cache_read('yamb:section:all');
+        if (! empty($boards)) {
+            return $this->success([
+                'boards' => $boards
+            ]);
+        }
+
         load("model/section");
         load("model/favor");
         try {
@@ -34,6 +41,7 @@ class SectionController extends NF_YambController
             $t['children'] = $this->findBoardsByRecursion($k, 1, $favs);
             $ret[] = $t;
         }
+        nforum_cache_write('yamb:section:all', $ret);
         return $this->success([
             'boards' => $ret,
         ]);
