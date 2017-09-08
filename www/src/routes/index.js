@@ -105,6 +105,12 @@ const router = new VueRouter({
     },
 
     {
+      name: 'mailSend',
+      path: '/mail/send',
+      component: MailSend
+    },
+
+    {
       name: 'mail',
       path: '/mail',
       component: Mail,
@@ -112,11 +118,6 @@ const router = new VueRouter({
         requireLogin: true
       },
       children: [
-        {
-          name: 'mailReply',
-          path: 'reply',
-          component: MailSend
-        },
         {
           name: 'mailContent',
           path: ':type/show/:num',

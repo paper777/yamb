@@ -43,7 +43,7 @@
 
 <script>
   import * as api from 'api/mail';
-  import FloatButton from 'components/FloatButton';
+  import FloatButton from 'components/ReplyFloatButton';
 
   export default {
     data() {
@@ -120,14 +120,16 @@
       },
 
       reply() {
-          let type = this.query.type;
-          let num = this.query.num;
-          let action = 'reply';
-          let to = this.mail.sender;
-          let title = this.mail.title.startsWith('Re: ') ?
-            this.mail.title: 'Re: ' + this.mail.title;
-          let url = `/mail/reply?type=${type}&num=${num}&action=${action}&to=${to}&title=${title}`;
-          this.$router.push(url);
+          this.$router.push({
+            name: `mailSend`,
+            query: {
+              action: 'reply',
+              to: this.mail.sender,
+              title: this.mail.title.startsWith('Re: ') ? this.mail.title: 'Re: ' + this.mail.title,
+              type: this.query.type,
+              num: this.query.num,
+            }
+          });
       },
 
     }

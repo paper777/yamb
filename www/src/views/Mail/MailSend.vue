@@ -8,7 +8,7 @@
         <div class="column is-2"> <i class="iconfont icon icon-smile" @click="expandSmileBox()"></i>
         </div>
         <div class="column is-2 post-button is-offset-7">
-          <a @click="sendReply()">发送</a>
+          <a @click="onSend()">发送</a>
         </div>
       </header>
     </div>
@@ -101,8 +101,9 @@ export default {
 
   created() {
     this.query = this.$route.query;
-    this.to = this.query.to;
+    this.action = this.query.action;
     this.title = this.query.title;
+    this.to = this.query.to;
   },
 
   mounted() {
@@ -126,46 +127,79 @@ export default {
     onSend() {
       switch(this.action) {
         case "reply":
-          sendReply();
+          this.replyMail();
           break;
         case "new":
-          sendMail();
+          this.sendMail();
           break;
         default:
-          console.log('no action specified!');
+          this.$toast('参数错误');
       }
-    },
-
-    sendReply() {
-      this.pageLoading = true;
-      let params = {
-        title: this.title,
-        content: this.content
-      };
-      if (!this.title) {
-        this.pageLoading = false;
-        this.$toast('标题不能为空');
-        return false;
-      }
-      if (!this.content) {
-        this.pageLoading = false;
-        this.$toast('内容不能为空');
-        return false;
-      }
-      api.replyMail(this.query.type, this.query.num, params).then(res => {
-        if (! res.success) {
-          this.$toast('发送失败');
-          return false;
-        }
-        this.pageLoading = false;
-        let url = `/mail/${this.query.type}?notification=回复成功`;
-        this.$router.push(url);
-      });
     },
 
     sendMail() {
-    
+      let data = {
+        title: this.title,
+        content: this.content,
+        id: this.query.to,
+      };
+      if (!data.id || !data.title || !data.content) {
+        this.pageLoading = false;
+        if (!data.id)
+          this.$toast('Oops，忘记要发给谁了...返回上级重进此页面试一下？');
+        else if (!data.title)
+          this.$toast('Oops，标题不能为空');
+        else if (!data.content)
+          this.$toast('Oops，内容不能为空');
+        return false;
+      }
+      api.sendMail(data)
+        .then(res => {
+          this.pageLoading = false;
+          if (!res.success) {
+            this.$toast('发送失败...');
+            return false;
+          }
+          this.$toast('发送成功', {
+            duration: 1000,
+            callback: () => {
+              this.$router.go(-1);
+            }
+          });
+        })
     },
+
+    replyMail() {
+      let data = {
+        title: this.title,
+        content: this.content,
+      };
+      if (!data.title || !data.content) {
+        this.pageLoading = false;
+        if (!data.title)
+          this.$toast('Oops，标题不能为空');
+        else if(!data.content)
+          this.$toast('Oops，内容不能为空');
+        return false;
+      }
+      api.replyMail(this.query.type, this.query.num, data)
+        .then(res => {
+          this.pageLoading = false;
+          if (!res.success) {
+            this.$toast('发送失败...');
+            return false;
+          }
+          this.$toast('发送成功', {
+            duration: 1000,
+            callback: () => {
+              this.$router.go(-1);
+            }
+          });
+        });
+    },
+
+
+
   }
 }
 </script>
