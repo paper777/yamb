@@ -18,13 +18,23 @@ require('./assets/icon.css');
 
 Vue.prototype.$http = Axios;
 Vue.prototype.$http.defaults.headers.common = {
-    'X-Requested-With': 'XMLHttpRequest'
+  'X-Requested-With': 'XMLHttpRequest'
 };
 
 sync(store, router);
 
 const app = new Vue({
-    router,
-    store,
-    render: h => h(App)
+  router,
+  store,
+  beforeCreate: () => {
+    // if the request is from nforum Index,
+    // transform the hash to a request url
+    // and try to redirect to it's page
+    let hash = window.location.hash;
+    if (hash.startsWith('#!')) {
+      const url = '/' + hash.substring(2);
+      router.push(url);
+    }
+  },
+  render: h => h(App)
 }).$mount('#app');

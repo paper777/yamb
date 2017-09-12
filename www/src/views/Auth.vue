@@ -1,6 +1,6 @@
 <template>
 <section class="login">
-<div class="main container">
+<div class="main container" v-show="show">
   <div class="header hero is-primary">
     <div class="hero-body">
       <div class="container">
@@ -48,17 +48,31 @@
 </template>
 
 <script>
-import * as api from 'api/auth';
-import { mapActions } from 'vuex'
+import * as api from 'api/auth'
+import { mapGetters, mapActions } from 'vuex'
 
 export default {
   data () {
     return {
+      show: false,
       username: '',
       password: '',
       error: false,
       year: new Date().getFullYear()
     }
+  },
+
+  created() {
+    if (this.profile.isLogin) {
+      return this.$route.push('/')
+    }
+    this.show = true
+  },
+
+  computed: {
+    ...mapGetters([
+      'profile'
+    ])
   },
 
   methods: {
@@ -69,7 +83,16 @@ export default {
         } else {
           this.login(res.data);
           this.error = false;
-          this.$router.push('/');
+          if (this.$route.query.redirect) {
+            let target = decodeURIComponent(this.$route.query.redirect);
+            if (target.match('login')) {
+              this.$router.push('/');
+            } else {
+              window.location.href = target;
+            }
+          } else {
+            this.$router.push('/');
+          }
         }
       });
     },
