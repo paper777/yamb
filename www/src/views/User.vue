@@ -117,7 +117,13 @@ export default {
     },
 
     sendMail() {
-      this.$toast('Ooops, 功能开发中...');
+      this.$router.push({
+        name: `mailSend`,
+        query: {
+          action: 'new',
+          to: this.$route.params.id,
+        }
+      })
     },
 
     addFriend() {

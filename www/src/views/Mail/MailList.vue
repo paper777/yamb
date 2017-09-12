@@ -17,13 +17,6 @@
           :linker="mailLinker(mail)">
         </mail-item>
       </div>
-
-      <div class="notification is-primary is-fullwidth"
-           v-bind:class="{'is-hidden': !hasNotification}"
-      >
-        <button class="delete large" @click="closeNotification"></button> <!-- TODO: `.is-large` not working -->
-        {{ notificationMessage }}
-      </div>
     </div>
 
   </section>
@@ -38,8 +31,6 @@
         isLoading: true,
         type: '',
         mails: [],
-        hasNotification: false,
-        notificationMessage: '这里是个notification',
       }
     },
 
@@ -58,22 +49,8 @@
       this.type = this.$route.params.type;
       this.fetchMailList(this.type);
 
-      if(this.$route.query.hasNotification) {
-
-        switch (this.$route.query.notificationType) {
-          case "deleted":
-            this.notificationMessage = `已删除邮件 "${this.$route.query.mailTitle}"`;
-            break;
-          default:
-            break;
-        }
-
-        this.hasNotification = true;
-
-        let t = this;
-        let timer = setTimeout(function(){
-          t.closeNotification();
-        }, 3000);
+      if(this.$route.query.notification) {
+        this.$toast(this.$route.query.notification);
       }
     },
 
@@ -96,18 +73,9 @@
         return '/mail/' + this.type + '/show/' + mailItem.num;
       },
 
-      closeNotification() {
-        // TODO: May add disappear animation
-        this.hasNotification = false;
-      }
     }
   }
 </script>
 
 <style scoped>
-  .notification {
-    width: 100%;
-    position: fixed;
-    bottom: 0;
-  }
 </style>
