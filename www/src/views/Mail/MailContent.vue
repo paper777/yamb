@@ -33,7 +33,7 @@
     </div>
 
     <!-- FAB -->
-    <div v-if="!error">
+    <div v-if="this.query.type !== 'deleted' && !error">
       <float-button @click.native='reply'></float-button>
     </div>
 

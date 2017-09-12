@@ -1,7 +1,7 @@
 <template>
   <section class="float-button-section" :class="[visible ? 'fade-in' : 'fade-out']">
     <div class="float-button">
-      <span> <i class="icon iconfont icon-reply"></i></span>
+      <span> <i class="icon iconfont icon-email"></i></span>
     </div>
   </section>
 </template>
