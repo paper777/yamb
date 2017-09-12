@@ -41,6 +41,7 @@
     watch: {
       '$route.params.type'(newType, oldType) {
         this.mails = [];
+        this.type = newType;
         this.fetchMailList(newType);
       }
     },
