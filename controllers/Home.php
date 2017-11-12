@@ -3,12 +3,8 @@ class HomeController extends NF_YambController {
 
     const PAGE_SIZE = 20;
 
-    public function init() {
-        parent::init();
-        $this->requestLogin();
-    }
-
     public function indexAction() { 
+        $this->requestLogin();
         load(['model/widget', 'inc/wrapper']);
         try {
             $widget = Widget::getInstance('topten');
@@ -62,6 +58,7 @@ class HomeController extends NF_YambController {
     }
 
     public function timelineAction() {
+        $this->requestLogin();
         load(['model/favorpost', 'inc/pagination', 'inc/wrapper', 'inc/ubb']);
 
         $count = c("pagination.threads");
@@ -89,6 +86,7 @@ class HomeController extends NF_YambController {
     }
 
     public function favAction() {
+        $this->requestLogin();
         load("model/favor");
 
         if (! empty($this->params['level'])) {
@@ -126,6 +124,7 @@ class HomeController extends NF_YambController {
     }
 
     public function bannerAction() {
+        $this->requestLogin();
         load('model/adv');
         $res = Adv::getMobileBanner();
 
@@ -143,6 +142,13 @@ class HomeController extends NF_YambController {
             'banners' => $banners
         ];
         return $this->success($data);
+    }
+
+    public function backToNforumAction() {
+        load('inc/cookie');
+        $cookie = Cookie::getInstance();
+        $cookie->write('site', 'nforum');
+        return $this->success();
     }
 
 }
