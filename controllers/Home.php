@@ -151,4 +151,10 @@ class HomeController extends NF_YambController {
         return $this->success();
     }
 
+    public function backToYambAction() {
+        load('inc/cookie');
+        $cookie = Cookie::getInstance();
+        $cookie->write('site', 'yamb');
+        return $this->success();
+    }
 }
