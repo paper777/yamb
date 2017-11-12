@@ -8,6 +8,8 @@ $export[] = array($api . '/banner', array('controller' => 'home', 'module' => 'y
 $export[] = array($api . '/home/topten', array('controller' => 'home', 'module' => 'yamb', 'action' => 'index'));
 $export[] = array($api . '/home/timeline', array('controller' => 'home', 'module' => 'yamb', 'action' => 'timeline'));
 $export[] = array($api . '/home/fav/:level', array('controller' => 'home', 'module' => 'yamb', 'action' => 'fav'));
+$export[] = array($api . '/back-to-nforum', array('controller' => 'home', 'module' => 'yamb', 'action' => 'backToNforum'));
+$export[] = array($api . '/back-to-yamb', array('controller' => 'home', 'module' => 'yamb', 'action' => 'backToYamb'));
 
 /** user */
 $export[] = array($api . '/auth/:action', array('controller' => 'auth', 'module' => 'yamb'));
