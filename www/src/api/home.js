@@ -23,3 +23,5 @@ export const getSections = (params = {}) => get('section', params)
 export const searchBoards = (params = { name: null }) => get(`section/${params.name}`)
 
 export const getBackToNforum = (params = { name: null }) => get(`back-to-nforum`)
+
+export const getBackToYamb = (params = { name: null }) => get(`back-to-yamb`)

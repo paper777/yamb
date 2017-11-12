@@ -23,7 +23,7 @@
 
 <script>
  import Navbar from 'components/Navbar'
- import { getBackToNforum } from 'api/home'
+ import { getBackToNforum, getBackToYamb } from 'api/home'
 
  export default {
    name: 'app',
@@ -36,6 +36,10 @@
      return {
        year: new Date().getFullYear()
      }
+   },
+
+   mounted() {
+       getBackToYamb()
    },
 
    methods: {
