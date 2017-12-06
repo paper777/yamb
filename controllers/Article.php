@@ -165,6 +165,8 @@ class ArticleController extends NF_YambController {
         } catch(ArticleNullException $e) {
             $head = null;
         }
+
+        $main = null;
         if ($head) {
             $db = DB::getInstance();
             $likesum = $db->one('select count(*) as sum from dianzan_usr where articleid = ? and bname = ?',array($head->ID, $this->board->NAME));
