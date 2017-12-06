@@ -169,6 +169,8 @@ class ArticleController extends NF_YambController {
         } catch(ArticleNullException $e) {
             $head = null;
         }
+
+        $main = null;
         if ($head) {
             $db = DB::getInstance();
             $likesum = Article::findVoteupNum($head->ID, $this->board->NAME);
