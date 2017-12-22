@@ -67,9 +67,9 @@ class ArticleController extends NF_YambController {
 
             // remove bottom lines
             $s = (($pos = strpos($content, "<br/><br/>")) === false) ? 0 : $pos + 10;
-            $e = (($pos = strpos($content, "<br/>--<br/>")) === false) 
-               ? strlen($content)
-               : $pos + 7;
+            $e = (($pos = strpos($content, "<br/>--<br/>")) === false)
+                ? strlen($content)
+                : $pos + 7;
             $content = preg_replace(
                 array("'^(<br/>)+'", "|(<br/>)+--$|")
                 ,array("", "<br>--")
@@ -91,13 +91,14 @@ class ArticleController extends NF_YambController {
             bbs_brcaddread($this->board->NAME, $v->ID);
 
             $db = DB::getInstance();
-
-            $likesum = $db->one('select count(*) as sum from dianzan_usr where articleid = ? and bname = ?',array($v->ID, $this->board->NAME));
-            $liked = $db->one('select count(*) as liked from dianzan_usr where articleid = ? and userid_like = ? and bname = ?',array($v->ID, $u->userid, $this->board->NAME));
+            //modified by lj
+            load('model/article');
+            $likesum = Article::findVoteupNum($v->ID,$this->board->NAME);
+            $liked = Article::findHisVoteupNum($v->ID,$u->userid,$this->board->NAME);
             $promed = $db->one('select flag from dianzan_stat where articleid = ? and bname = ?',array($v->ID, $this->board->NAME));
-            //2017-9 lj add
-            $votedown_sum = $db->one('select count(*) as sum from votedown_usr where articleid = ? and bname = ?',array($v->ID, $this->board->NAME));
-            $user_choose = $db->one('select count(*) as votedown from votedown_usr where articleid = ? and userid = ? and bname = ?',array($v->ID, $u->userid, $this->board->NAME));
+
+            $votedown_sum = Article::findVotedownNum($v->ID,$this->board->NAME);
+            $unliked = Article::findHisVotedownNum($v->ID,$u->userid,$this->board->NAME);
 
             $meta = [
                 "id" => $v->ID,
@@ -106,12 +107,12 @@ class ArticleController extends NF_YambController {
                 "pos" => $v->getPos(),
                 "content" => $content,
                 "subject" => $v->isSubject(),
-                "voted" => $liked['liked'] ? true : false,
+                "voted" => $liked > 0 ? true : false,
                 "promed" => $promed['flag'],
-                "voteup_count" => $likesum['sum'],
-                //2017-9 lj add
-                "votedown" => $user_choose['votedown'],
-                "votedown_count" => $votedown_sum['sum']
+                "voteup_count" => $likesum,
+                "voteddown" => $unliked > 0 ? true : false,
+                "votedown_count" => $votedown_sum,
+                "votedown_min" => c("article.votedown_min"),
             ];
             try {
                 $meta['poster'] = $wrapper->user(User::getInstance($v->OWNER));
@@ -122,50 +123,13 @@ class ArticleController extends NF_YambController {
         }
 
 
-        // popular replies
+        // popular replies, modified by lj
         // @see app\controllersr\Article
         if ($page == 1) {
             $link = DB::getInstance();
             $bname = $this->board->NAME;
-            //2017-9 lj noted
-//            $articleLike1 = $link->all("select * from dianzan_stat where threadid = ? and bname = ? and
-//                                            ( flag = 1 or ( flag = 0  and likesum > ?) ) order by flag desc, likesum desc ",
-//                                        array($gid, $bname, c("article.like_bor")));
-//            $sum = count($articleLike1);
-//            if($sum < c("article.like_lim")) {
-//                $articleLike2 = $link->all("select * from dianzan_stat where threadid = ? and bname = ? and flag = 0 and ( likesum between ? and ? ) order by flag desc, likesum desc limit ".(c("article.like_lim") - $sum), array($gid, $bname, c("article.like_min"), c("article.like_bor")));
-//                shuffle($articleLike2);
-//                $likes = array_merge($articleLike1, $articleLike2);
-//            } else {
-//                $likes = array_slice($articleLike1, 0, c("article.like_lim"));
-//            }
-            //2017-9 lj add
-            $up_query = $link->all("SELECT articleid FROM `dianzan_stat` WHERE threadid = ? and bname = ?  and 
-                                      ( flag = 1 or ( flag = 0  and likesum > ? ) )",
-                array($gid, $bname));
-            $up_articles = [];
-            foreach ($up_query as $up_one){
-                $up_articles[] = $up_one['articleid'];
-            }
-            $up_articles = implode(",",$up_articles);
 
-            $relative_up_1 = $link->all("select * from (SELECT up.articleid, ifnull(up.likesum,0)-ifnull(down.unlikesum,0) as relative_sum,
-ifnull(up.flag,0) as flag,ifnull(up.likesum,0) as upsum,ifnull(down.unlikesum,0) as downsum FROM  `dianzan_stat` AS up LEFT JOIN  `votedown_stat`
- AS down ON up.articleid = down.articleid WHERE up.articleid IN ? ) AS test WHERE test.relative_sum>?  or test.flag >0 order by test.flag desc, test.relative_sum desc",
-                array($up_articles,c("article.like_bor")));
-
-            $sum = count($relative_up_1);
-
-            if($sum < c("article.like_lim")) {
-                $relative_up_2 = $link->all("select * from (SELECT up.articleid, ifnull(up.likesum,0)-ifnull(down.unlikesum,0) as relative_sum,
-ifnull(up.flag,0) as flag,ifnull(up.likesum,0) as upsum,ifnull(down.unlikesum,0) as downsum FROM  `dianzan_stat` AS up LEFT JOIN  `votedown_stat`
- AS down ON up.articleid = down.articleid WHERE up.articleid IN ? ) AS test WHERE test.flag = 0 and (test.relative_sum between ? and ? ) 
- order by test.relative_sum desc limit ".(c("article.like_lim") - $sum), array(c("article.like_min"), c("article.like_bor")));
-                shuffle($relative_up_2);
-                $relative_up = array_merge($relative_up_1, $relative_up_2);
-            } else {
-                $relative_up = array_slice($relative_up_1, 0, c("article.like_lim"));
-            }
+            $relative_up = Article::niceComment($gid, $bname);
 
             // now wrap popular articles
             $popularReplies = [];
@@ -178,18 +142,16 @@ ifnull(up.flag,0) as flag,ifnull(up.likesum,0) as upsum,ifnull(down.unlikesum,0)
                     'pos' => $article->getPos(),
                     'id' => (int) $meta['articleid'],
                     'flag' => $meta['flag'],
-                    'voteup_count' => $meta['upsum'],
-                    'votedown_count' => $meta['downsum'],
+                    'voteup_count' => $meta['likesum'],
+                    'votedown_count' => $meta['csum'],
                 ];
 
                 // check whether user has voted up or down
                 $user = User::getInstance();
-                $voted_up = $link->one('SELECT COUNT(*) AS up FROM `dianzan_usr` WHERE `articleid` = ? and `userid_like` = ? 
-                              and `bname` = ?', array($meta['articleid'], $user->userid, $bname));
-                $voted_down = $link->one('SELECT COUNT(*) AS down FROM `votedown_usr` WHERE `articleid` = ? and `userid` = ? 
-                              and `bname` = ?', array($meta['articleid'], $user->userid, $bname));
-                $data['voted'] = ! empty($voted_up['liked']);
-                $data['voteddown'] = ! empty($voted_down['down']);
+                $voted_up = Article::findHisVoteupNum($meta['articleid'],$user->userid,$bname);
+                $voted_down = Article::findHisVotedownNum($meta['articleid'], $user->userid, $bname);
+                $data['voted'] = $voted_up > 0 ? true : false;
+                $data['voteddown'] = $voted_down > 0 ? true : false;
 
                 try {
                     $data['poster'] = $wrapper->user(User::getInstance($article->OWNER));
@@ -198,7 +160,7 @@ ifnull(up.flag,0) as flag,ifnull(up.likesum,0) as upsum,ifnull(down.unlikesum,0)
                 }
 
                 $popularReplies[] = $data;
-                unset($popularReplies['linkesum']);
+//                unset($popularReplies['likesum']);
             }
         }
 
@@ -209,17 +171,22 @@ ifnull(up.flag,0) as flag,ifnull(up.likesum,0) as upsum,ifnull(down.unlikesum,0)
         }
         if ($head) {
             $db = DB::getInstance();
-            $likesum = $db->one('select count(*) as sum from dianzan_usr where articleid = ? and bname = ?',array($head->ID, $this->board->NAME));
-            $liked = $db->one('select count(*) as liked from dianzan_usr where articleid = ? and userid_like = ? and bname = ?',array($head->ID, $u->userid, $this->board->NAME));
+            $likesum = Article::findVoteupNum($head->ID, $this->board->NAME);
+            $votedown_sum = Article::findVotedownNum($head->ID,$this->board->NAME);
+            $liked = Article::findHisVoteupNum($head->ID, $u->userid, $this->board->NAME);
             $promed = $db->one('select flag from dianzan_stat where articleid = ? and bname = ?',array($head->ID, $this->board->NAME));
+            $unliked = Article::findHisVotedownNum($v->ID,$u->userid,$this->board->NAME);
 
             $main = [
                 "id" => $head->ID,
                 "time" => $this->formatTime($head->POSTTIME),
-                "voted" => $liked['liked'] ? true : false,
+                "voted" => $liked > 0 ? true : false,
+                "voteddown"=> $unliked > 0 ? true : false,
                 "promed" => $promed['flag'],
-                "voteup_count" => $likesum['sum']
-                ];
+                "voteup_count" => $likesum,
+                "votedown_count" => $votedown_sum
+
+            ];
             try {
                 $main['poster'] = $wrapper->user(User::getInstance($head->OWNER));
             } catch(Exception $e) {
@@ -250,6 +217,48 @@ ifnull(up.flag,0) as flag,ifnull(up.likesum,0) as upsum,ifnull(down.unlikesum,0)
             $this->abort();
         }
 
+        if (empty($this->params['gid'])){
+            return $this->fail('article id is not defined');
+        }
+        $id = (int) $this->params['gid'];
+
+        try {
+            $article = Article::getInstance($id, $this->board);
+        } catch (ArticleNullException $e) {
+            return $this->fail('article null');
+        }
+
+        // if ($article->isSubject()) {
+        //     return $this->fail('subject is not allowed');
+        // }
+
+        $user = User::getInstance();
+
+        $gid = $article->GROUPID;
+        $bname = $this->board->NAME;
+        load('inc/db');
+
+        //modified by lj
+        load('model/article');
+        if($id == $gid){
+            $voteup_result = Article::supportInsert($id,$bname,$this->board,$this);
+        }else {
+            $voteup_result = Article::voteupInsert($id, $bname, $this->board, $this);
+        }
+        if($voteup_result['ajax_code'] == '1601' || $voteup_result['ajax_code'] == '1604'
+            || $voteup_result['ajax_code'] == '1607' || $voteup_result['ajax_code'] == '0309'){
+            return $this->success(['up_count' => $voteup_result['data']['lsum'],'down_count' => $voteup_result['data']['csum']]);
+        }else{
+            return $this->fail($voteup_result['ajax_code']);
+        }
+    }
+
+    //add by lj
+    public function votedownAction(){
+        if (! $this->getRequest()->isPost()) {
+            $this->abort();
+        }
+
         if (empty($this->params['form']['id'])) {
             return $this->fail('article id is not defined');
         }
@@ -269,68 +278,26 @@ ifnull(up.flag,0) as flag,ifnull(up.likesum,0) as upsum,ifnull(down.unlikesum,0)
 
         $gid = $article->GROUPID;
         $bname = $this->board->NAME;
-        load('inc/db');
 
-        // pre check
-        $link = DB::getInstance();
-        $isliked = $link->one('SELECT COUNT(*) AS liked FROM `dianzan_usr` WHERE `articleid` = ? and `userid_like` = ? and `bname` = ?', array($id, $user->userid, $bname));
-        //lj add
-        $isunliked = $link->one('SELECT COUNT(*) AS unliked FROM `votedown_usr` WHERE `articleid` = ? and `userid` = ? and `bname` = ?', array($id, $user->userid, $bname));
-        if ($isliked['liked'] >= c("article.like_per")) {
-            return $this->fail('you have voted up');
-        }
-        //lj add
-        if( $isunliked['unliked'] > 0){
-            return $this->fail('you have voted down');
+        load('model/article');
+        if($id == $gid){
+            $votedown_result = Article::opposeInsert($id,$bname,$this->board,$this);
+        }else {
+            $votedown_result = Article::votedownInsert($id,$bname,$this->board,$this);
         }
 
-        $score = $user->score_user;
-        if ($score < max(c("article.min_need_score"), c("article.like_sub"))) {
-            return $this->fail('score not enough');
+        if($votedown_result['ajax_code'] == '1609'){
+            return $this->success(['up_count' => $votedown_result['data']['lsum'],'down_count' => $votedown_result['data']['csum']]);
+        }else{
+            return $this->fail($votedown_result['ajax_code']);
         }
-
-        // vote
-        $val = [
-            'userid_like' => $user->userid,
-            'articleid' => $id,
-            'bname' => $bname
-        ];
-        $link->insert('dianzan_usr', $val);
-
-        $sum = $link->one('SELECT COUNT(*) AS likesum FROM `dianzan_usr` WHERE `articleid`= ? and `bname` = ?',array($id, $bname));
-        $sum = $sum['likesum'];
-
-        // update state log
-        $isblank = $link->one('SELECT COUNT(*) AS blank FROM `dianzan_stat` WHERE `articleid` = ? and `bname` = ?',array($id, $bname));
-        if ($isblank['blank'] == 0) {
-            $val = [
-                'articleid' => $id,
-                'threadid' => $gid,
-                'bname' => $bname,
-                'likesum' => $sum,
-            ];
-            $link->insert('dianzan_stat', $val);
-        } else {
-            $link->update('dianzan_stat', array('likesum' => $sum), 'WHERE `articleid` = ? and `bname`= ?', array($id, $bname));
-        }
-
-        // modify user socre
-        try {
-            $poster = User::getInstance($article->OWNER);
-            $user->modifyScore(c("article.like_sub") * -1, '为用户 ' . $poster->userid . ' 点赞 ' . $bname . '版 主题帖ID:' . $gid);
-            $poster->modifyScore(c("article.like_add"), '用户 ' . $user->userid  . ' 为你点赞 ' . $bname . '版 主题帖ID:' . $gid);
-        } catch(UserNullException $e) {
-            return $this-fail('failed');
-        }
-
-        return $this->success(['count' => $sum]);
     }
 
     public function prereplyAction() {
         if ($this->board->isReadOnly()) {
             return  $this->fail('只读版面');
         }
-        if (! $this->board->hasPostPerm(User::getInstance())) { 
+        if (! $this->board->hasPostPerm(User::getInstance())) {
             return  $this->fail('缺少权限或者未登录');
         }
 
@@ -361,7 +328,7 @@ ifnull(up.flag,0) as flag,ifnull(up.likesum,0) as upsum,ifnull(down.unlikesum,0)
         if ($this->board->isReadOnly()) {
             return  $this->fail('只读版面');
         }
-        if (! $this->board->hasPostPerm(User::getInstance())) { 
+        if (! $this->board->hasPostPerm(User::getInstance())) {
             return  $this->fail('缺少权限或者未登录');
         }
 
@@ -382,7 +349,7 @@ ifnull(up.flag,0) as flag,ifnull(up.likesum,0) as upsum,ifnull(down.unlikesum,0)
         if ($this->board->isReadOnly()) {
             return  $this->fail('只读版面');
         }
-        if (! $this->board->hasPostPerm(User::getInstance())) { 
+        if (! $this->board->hasPostPerm(User::getInstance())) {
             return  $this->fail('缺少权限');
         }
 
@@ -420,7 +387,7 @@ ifnull(up.flag,0) as flag,ifnull(up.likesum,0) as upsum,ifnull(down.unlikesum,0)
         $content = trim($this->params['form']['content']);
         $subject = nforum_iconv($this->encoding, 'GBK', $subject);
         $content = nforum_iconv($this->encoding, 'GBK', $content);
-            
+
         //$subject = rawurldecode($subject);
         $sig = User::getInstance()->signature;
         $email = 0; $anony = null; $outgo = 0;
@@ -451,7 +418,7 @@ ifnull(up.flag,0) as flag,ifnull(up.likesum,0) as upsum,ifnull(down.unlikesum,0)
             return $this->fail('只读版面');
         }
 
-        if (! $this->board->hasPostPerm(User::getInstance())) { 
+        if (! $this->board->hasPostPerm(User::getInstance())) {
             return  $this->fail('缺少权限');
         }
 
@@ -504,7 +471,7 @@ ifnull(up.flag,0) as flag,ifnull(up.likesum,0) as upsum,ifnull(down.unlikesum,0)
             return $this->fail('只读版面');
         }
 
-        if (! $this->board->hasPostPerm(User::getInstance())) { 
+        if (! $this->board->hasPostPerm(User::getInstance())) {
             return  $this->fail('缺少权限');
         }
 
@@ -527,7 +494,7 @@ ifnull(up.flag,0) as flag,ifnull(up.likesum,0) as upsum,ifnull(down.unlikesum,0)
 
         if (! $article->hasEditPerm(User::getInstance())) {
             return $this->fail('无编辑权限');
-        }       
+        }
 
         $subject = trim($this->params['form']['subject']);
         $content = trim($this->params['form']['content']);
@@ -540,73 +507,4 @@ ifnull(up.flag,0) as flag,ifnull(up.likesum,0) as upsum,ifnull(down.unlikesum,0)
         return $this->success();
     }
 
-    public function votedownAction() {
-        if (! $this->getRequest()->isPost()) {
-            $this->abort();
-        }
-
-        if (empty($this->params['form']['id'])) {
-            return $this->fail('article id is not defined');
-        }
-        $id = $this->params['form']['id'];
-
-        try {
-            $article = Article::getInstance($id, $this->board);
-        } catch (ArticleNullException $e) {
-            return $this->fail('article null');
-        }
-
-        // if ($article->isSubject()) {
-        //     return $this->fail('subject is not allowed');
-        // }
-
-        $user = User::getInstance();
-
-        $gid = $article->GROUPID;
-        $bname = $this->board->NAME;
-        load('inc/db');
-
-        // pre check
-        $link = DB::getInstance();
-        $isliked = $link->one('SELECT COUNT(*) AS liked FROM `dianzan_usr` WHERE `articleid` = ? and `userid_like` = ? and `bname` = ?', array($id, $user->userid, $bname));
-        $isunliked = $link->one('SELECT COUNT(*) AS unliked FROM `votedown_usr` WHERE `articleid` = ? and `userid` = ? and `bname` = ?', array($id, $user->userid, $bname));
-        if ($isunliked['unliked'] >= c("article.unlike_per")) {
-            return $this->fail('you have voted down');
-        }
-        if( $isliked['liked'] > 0){
-            return $this->fail('you have voted up');
-        }
-
-//        $score = $user->score_user;
-//        if ($score < max(c("article.min_need_score"), c("article.like_sub"))) {
-//            return $this->fail('score not enough');
-//        }
-
-        // vote
-        $val = [
-            'userid' => $user->userid,
-            'articleid' => $id,
-            'bname' => $bname
-        ];
-        $link->insert('votedown_usr', $val);
-
-        $sum = $link->one('SELECT COUNT(*) AS unlikesum FROM `votedown_usr` WHERE `articleid`= ? and `bname` = ?',array($id, $bname));
-        $sum = $sum['unlikesum'];
-
-        // update state log
-        $isblank = $link->one('SELECT COUNT(*) AS blank FROM `votedown_stat` WHERE `articleid` = ? and `bname` = ?',array($id, $bname));
-        if ($isblank['blank'] == 0) {
-            $val = [
-                'articleid' => $id,
-                'threadid' => $gid,
-                'bname' => $bname,
-                'unlikesum' => $sum,
-            ];
-            $link->insert('votedown_stat', $val);
-        } else {
-            $link->update('votedown_stat', array('unlikesum' => $sum), 'WHERE `articleid` = ? and `bname`= ?', array($id, $bname));
-        }
-
-        return $this->success(['count' => $sum]);
-    }
 }
