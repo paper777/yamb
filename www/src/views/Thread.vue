@@ -163,16 +163,31 @@
         </div>
       </div>
     </section>
+    <section class="paginate" v-show="showVoteChoice" style="margin-bottom: 10px;">
+      <div class="card">
+      <header class="columns  is-mobile paginate-items">
+            <div class="column">
+              <a v-if="mainPost && ! mainPost.voted" @click="voteup(mainPost, -1);showVote();">赞 {{ mainPost.voteup_count }}</a>
+              <a v-else @click="showVote()">赞 {{ mainPost.voteup_count }}</a>
+            </div>
+            <div class="column">
+              <a v-if="mainPost && ! mainPost.voteddown" @click="votedown(mainPost, -1);showVote();">踩 {{ mainPost.votedown_count }}</a>
+              <a v-else @click="showVote()">踩 {{ mainPost.votedown_count }}</a>
+            </div>
+      </header>
+      </div>
+    </section>
     <section class="paginate" v-if="! isLoading">
       <div class="card">
         <header class="columns is-mobile paginate-items">
           <div class="column">
-            <a v-if="mainPost && ! mainPost.voted" @click="voteup(mainPost, -1)">顶 {{ mainPost.voteup_count }}</a>
-            <a v-else>顶 {{ mainPost.voteup_count }}</a>
-          </div>
-          <div class="column">
-            <a v-if="mainPost && ! mainPost.voteddown" @click="votedown(mainPost, -1)">踩 {{ mainPost.votedown_count }}</a>
-            <a v-else>踩 {{ mainPost.votedown_count }}</a>
+            <a @click="showVote">
+            <span>
+              <i class="iconfont icon-less up"></i>
+              <i class="iconfont icon-moreunfold down"></i>
+            </span>
+              赞 {{ mainPost.voteup_count }}
+            </a>
           </div>
           <div class="column">
             <a @click="getPrevPage">上一页</a>
@@ -226,6 +241,9 @@ export default {
       posts: [],
       popularReplies: [],
       cachePosts: {},
+
+      //show vote up&down
+      showVoteChoice: false,
 
       removeSelected: false
     }
@@ -324,6 +342,10 @@ export default {
       }
       this.currentPage ++;
       this.fetchArticles();
+    },
+
+    showVote(){
+      this.showVoteChoice = !this.showVoteChoice;
     },
 
     voteup(article, index) {
@@ -449,5 +471,17 @@ h4 {
 }
 .remove-selected {
     background-color: #fff;
+}
+.up,.down {   
+    font-size: 10px;
+    line-height:10px;
+}
+.up {
+    position:absolute;
+    top:30%;
+}
+.down {
+    position:relative;
+    top:15%;
 }
 </style>
