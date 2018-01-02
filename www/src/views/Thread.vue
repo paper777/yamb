@@ -37,13 +37,19 @@
                 <a @click="reply(mainPost)"><i class="iconfont icon-comments"></i></a>
               </span>
               <span>
-                <a v-if="! mainPost.voted" @click="voteup(mainPost, -1)">
+                <a v-if="! mainPost.voted" @click="voteup(mainPost,-1)">
                   <i class="iconfont icon-good"></i>
                 </a>
                 <i v-else class="iconfont icon-good voted"></i>
                 {{ mainPost.voteup_count }}
               </span>
-
+              <span>
+                <a v-if="! mainPost.voteddown" @click="votedown(mainPost, -1)">
+                  <i class="iconfont icon-bad"></i>
+                </a>
+                <i v-else class="iconfont icon-bad voted"></i>
+                {{ mainPost.votedown_count }}
+              </span>
             </div>
           </div>
           <div class="article-body content"  v-html="mainPost.content"> </div>
@@ -89,6 +95,13 @@
                   <i v-else class="iconfont icon-good voted"></i>
                   {{ article.voteup_count }}
                 </span>
+                <span>
+                  <a v-if="! article.voteddown" @click="votedown(article, index)">
+                    <i class="iconfont icon-bad"></i>
+                  </a>
+                  <i v-else class="iconfont icon-bad voted"></i>
+                  {{ article.votedown_count }}
+                </span>
               </div>
             </div>
             <div class="article-body content" v-html="article.content"> </div>
@@ -108,8 +121,9 @@
               </figure>
               <div class="media-content">
                 <div class="content">
-                  <h4 @click="jumpToUser(article)" :class="[ article.poster ? (article.poster.gender == 'm' ? 'gender-m' : 'gender-f') : 'gender-u' ]"> {{ article.poster ? article.poster.id : '已注销'}}</h4>
+                  <h4 @click="jumpToUser(article)" :class="[ article.poster ? (article.poster.gender == 'm' ? 'gender-m' : 'gender-f') : 'gender-u' ]" v-show="article.votedown_count - article.voteup_count < article.votedown_min"> {{ article.poster ? article.poster.id : '已注销'}}</h4>
                   <small>
+                  <h4 :class="[ article.poster ? (article.poster.gender == 'm' ? 'gender-m' : 'gender-f') : 'gender-u' ]" v-show="article.votedown_count - article.voteup_count >= article.votedown_min">****</h4>
                     <span>{{ article.pos == 1 ? '沙发' : article.pos == 2 ? '板凳' : article.pos +  '楼' }}</span>
                     {{ article.time }}
                   </small>
@@ -129,20 +143,51 @@
                   <i v-else class="iconfont icon-good voted"></i>
                   {{ article.voteup_count }}
                 </span>
+                <span>
+                  <a v-if="! article.voteddown" @click="votedown(article, index)">
+                    <i class="iconfont icon-bad"></i>
+                  </a>
+                  <i v-else class="iconfont icon-bad voted"></i>
+                  {{ article.votedown_count }}
+                </span>
               </div>
             </div>
-            <div class="article-body content" v-html="article.content" :class="{ 'selected-content': article.pos == position, 'remove-selected': removeSelected }"> </div>
+            <div class="article-body content" v-html="article.content" :class="{ 'selected-content': article.pos == position, 'remove-selected': removeSelected }" v-show="article.votedown_count - article.voteup_count < article.votedown_min"> </div>
+            <div class="a-background" v-show="article.votedown_count - article.voteup_count >= article.votedown_min">
+                  <p>此楼踩的人太多已被折叠。</p>
+                  <p>请多多注意自己的发言哦...</p>
+                  <a class="a-func-dispCai button" @click="votedown_view(article.pos)">手贱想看</a>
+            </div>
             <hr>
           </div>
         </div>
+      </div>
+    </section>
+    <section class="paginate" v-show="showVoteChoice" style="margin-bottom: 10px;">
+      <div class="card">
+      <header class="columns  is-mobile paginate-items">
+            <div class="column">
+              <a v-if="mainPost && ! mainPost.voted" @click="voteup(mainPost, -1);showVote();">赞 {{ mainPost.voteup_count }}</a>
+              <a v-else @click="showVote()">赞 {{ mainPost.voteup_count }}</a>
+            </div>
+            <div class="column">
+              <a v-if="mainPost && ! mainPost.voteddown" @click="votedown(mainPost, -1);showVote();">踩 {{ mainPost.votedown_count }}</a>
+              <a v-else @click="showVote()">踩 {{ mainPost.votedown_count }}</a>
+            </div>
+      </header>
       </div>
     </section>
     <section class="paginate" v-if="! isLoading">
       <div class="card">
         <header class="columns is-mobile paginate-items">
           <div class="column">
-            <a v-if="mainPost && ! mainPost.voted" @click="voteup(mainPost, -1)">顶 {{ mainPost.voteup_count }}</a>
-            <a v-else>顶 {{ mainPost.voteup_count }}</a>
+            <a @click="showVote">
+            <span>
+              <i class="iconfont icon-less up"></i>
+              <i class="iconfont icon-moreunfold down"></i>
+            </span>
+              赞 {{ mainPost.voteup_count }}
+            </a>
           </div>
           <div class="column">
             <a @click="getPrevPage">上一页</a>
@@ -196,6 +241,9 @@ export default {
       posts: [],
       popularReplies: [],
       cachePosts: {},
+
+      //show vote up&down
+      showVoteChoice: false,
 
       removeSelected: false
     }
@@ -296,19 +344,51 @@ export default {
       this.fetchArticles();
     },
 
+    showVote(){
+      this.showVoteChoice = !this.showVoteChoice;
+    },
+
     voteup(article, index) {
-      api.voteup(this.board.name, { id: article.id }).then((res) => {
+      api.voteup(this.board.name, article.id, {id:article.id}).then((res) => {
         if (! res.success) {
           // TODO 
           return false;
         }
         article.voted = true;
-        article.voteup_count = res.data.count;
+        article.voteddown = false;
+        article.voteup_count = res.data.up_count;
+        article.votedown_count = res.data.down_count;
         if (index == -1) {
           return this.mainPost = article;
         }
         this.posts[index] = article;
       });
+    },
+
+    votedown(article, index) {
+      api.votedown(this.board.name, article.id, { id: article.id }).then((res) => {
+        if (! res.success) {
+          // TODO
+          return false;
+        }
+        article.voted = false;
+        article.voteddown = true;
+        article.voteup_count = res.data.up_count;
+        article.votedown_count = res.data.down_count;
+        if (index == -1) {
+          return this.mainPost = article;
+        }
+        this.posts[index] = article;
+      });
+    },
+
+    votedown_view(index) {
+      var article_dom = document.getElementById(index);
+      var username = article_dom.getElementsByClassName("content")[0].getElementsByTagName("h4");
+      username[0].style.display = "block";
+      username[1].style.display = "none";
+      article_dom.getElementsByClassName("article-body")[0].style.display = "block";
+      article_dom.getElementsByClassName("a-background")[0].style.display = "none";
     },
 
     edit(article) {
@@ -383,7 +463,7 @@ h4 {
 .media-right a {
     color: #4a4a4a;
 }
-voted {
+.voted {
     color: #00d1b2;
 }
 .selected-content {
@@ -391,5 +471,17 @@ voted {
 }
 .remove-selected {
     background-color: #fff;
+}
+.up,.down {   
+    font-size: 10px;
+    line-height:10px;
+}
+.up {
+    position:absolute;
+    top:30%;
+}
+.down {
+    position:relative;
+    top:15%;
 }
 </style>
