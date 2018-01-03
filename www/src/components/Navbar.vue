@@ -5,7 +5,7 @@
       <div class="container">
         <div class="nav-left">
           <div class="nav-item">
-            <h3 class="title is-6" @click="$router.push('/home/topten')">北邮人论坛-alpha</h3>
+            <h3 class="title is-6" @click="$router.push('/home/topten')">北邮人论坛</h3>
           </div>
         </div>
         <div class="nav-center">

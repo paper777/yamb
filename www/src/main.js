@@ -10,11 +10,11 @@ import store from './store';
 
 import Toast from './plugins/toast';
 
+import picker from 'vue-3d-picker'
+
 Vue.use(Toast);
 
-// These are required by FAB
-require('./assets/animate.min.css');
-require('./assets/icon.css');
+Vue.component(picker.name, picker)
 
 Vue.prototype.$http = Axios;
 Vue.prototype.$http.defaults.headers.common = {

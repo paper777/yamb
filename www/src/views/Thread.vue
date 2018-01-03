@@ -163,44 +163,51 @@
         </div>
       </div>
     </section>
-    <section class="paginate" v-show="showVoteChoice" style="margin-bottom: 10px;">
-      <div class="card">
-      <header class="columns  is-mobile paginate-items">
-            <div class="column">
-              <a v-if="mainPost && ! mainPost.voted" @click="voteup(mainPost, -1);showVote();">赞 {{ mainPost.voteup_count }}</a>
-              <a v-else @click="showVote()">赞 {{ mainPost.voteup_count }}</a>
-            </div>
-            <div class="column">
-              <a v-if="mainPost && ! mainPost.voteddown" @click="votedown(mainPost, -1);showVote();">踩 {{ mainPost.votedown_count }}</a>
-              <a v-else @click="showVote()">踩 {{ mainPost.votedown_count }}</a>
-            </div>
-      </header>
-      </div>
-    </section>
+
     <section class="paginate" v-if="! isLoading">
+      <picker v-model="pagePickerVisible" :data-items="pagePickerData" @change="pageChanged">
+        <div class="top-content" slot="top-content">
+          <div class="card">
+            <header class="columns is-mobile paginate-items">
+              <div class="column"> <a @click="hidePagePicker">取消</a> </div>
+              <div class="column"> <a @click="getFirstPage">首页</a> </div>
+              <div class="column"> <span>{{ currentPage + '/' + totalPage }}</span></div>
+              <div class="column"> <a @click="getLastPage">末页</a> </div>
+              <div class="column"> <a @click="getSelectedPage">确认</a> </div>
+            </header>
+   
+          </div>
+        </div>
+      </picker>
+
+      <div class="card" v-show="showVoteChoice" style="margin-bottom: 10px;">
+        <header class="columns  is-mobile paginate-items">
+          <div class="column">
+            <a v-if="mainPost && ! mainPost.voted" @click="voteup(mainPost, -1);showVote();">赞 {{ mainPost.voteup_count }}</a>
+            <a v-else @click="showVote()">赞 {{ mainPost.voteup_count }}</a>
+          </div>
+          <div class="column">
+            <a v-if="mainPost && ! mainPost.voteddown" @click="votedown(mainPost, -1);showVote();">踩 {{ mainPost.votedown_count }}</a>
+            <a v-else @click="showVote()">踩 {{ mainPost.votedown_count }}</a>
+          </div>
+        </header>
+      </div>
+
       <div class="card">
         <header class="columns is-mobile paginate-items">
           <div class="column">
             <a @click="showVote">
-            <span>
-              <i class="iconfont icon-less up"></i>
-              <i class="iconfont icon-moreunfold down"></i>
-            </span>
+              <span>
+                <i class="iconfont icon-less up"></i>
+                <i class="iconfont icon-moreunfold down"></i>
+              </span>
               赞 {{ mainPost.voteup_count }}
             </a>
           </div>
-          <div class="column">
-            <a @click="getPrevPage">上一页</a>
-          </div>
-          <div class="column">
-            <a>{{ currentPage + '/' + totalPage }}</a>
-          </div>
-          <div class="column">
-            <a @click="getNextPage">下一页</a>
-          </div>
-          <div class="column">
-            <a @click="reply(mainPost)">回复</a>
-          </div>
+          <div class="column"> <a @click="getPrevPage">上页</a> </div>
+          <div class="column"> <a @click="showPagePicker">{{ currentPage + '/' + totalPage }}</a> </div>
+          <div class="column"> <a @click="getNextPage">下页</a> </div>
+          <div class="column"> <a @click="reply(mainPost)">回复</a> </div>
         </header>
       </div>
     </section>
@@ -208,280 +215,324 @@
 </template>
 
 <script>
-import * as api from 'api/thread'
+ import * as api from 'api/thread'
 
-export default {
-  data () {
-    return {
-      query: {
-        board: '',
-        id: ''
-      },
+ export default {
+   data () {
+     return {
+       query: {
+         board: '',
+         id: ''
+       },
 
-      position: 0,
+       position: 0,
 
-      isLoading: true,
+       isLoading: true,
 
-      title: '加载中...',
-      time: '',
-      gid: 0,
-      board: {
-        description: 'loading',
-        name: '...'
-      },
+       title: '加载中...',
+       time: '',
+       gid: 0,
+       board: {
+         description: 'loading',
+         name: '...'
+       },
 
-      // pagination
-      currentPage: 1,
-      totalPage: 1,
+       // pagination
+       currentPage: 1,
+       totalPage: 1,
 
-      anony: false,
+       anony: false,
 
-      // posts
-      mainPost: null,
-      posts: [],
-      popularReplies: [],
-      cachePosts: {},
+       // posts
+       mainPost: null,
+       posts: [],
+       popularReplies: [],
+       cachePosts: {},
 
-      //show vote up&down
-      showVoteChoice: false,
+       pagePickerVisible: false,
+       pagePickerData: [],
+       selectedPage: 1,
 
-      removeSelected: false
-    }
-  },
+       //show vote up&down
+       showVoteChoice: false,
 
-  watch: {
-  },
+       removeSelected: false
+     }
+   },
 
-  created() {
-    let location = this.$route.query;
-    if (location.page) {
-      this.currentPage = location.page;
-    }
+   watch: {
+   },
 
-    if (location.pos) {
-      this.currentPage = parseInt(location.pos / 10) + 1;
-      this.position = location.pos;
-    }
-    
-    this.query = this.$route.params;
-    this.fetchArticles();
-  },
+   created() {
+     let location = this.$route.query;
+     if (location.page) {
+       this.currentPage = location.page;
+     }
 
-  methods: {
-    fetchArticles() {
-      this.isLoading = true;
-      const page = this.currentPage;
-      if (page in this.cachePosts) {
-        this.isLoading = false;
-        return this.posts = this.cachePosts[page];
-      }
-      api.getThread(this.query.board, this.query.id, { page }).then((res) => {
-        if (! res.success) {
-          // TODO
-          return false;
-        }
+     if (location.pos) {
+       this.currentPage = parseInt(location.pos / 10) + 1;
+       this.position = location.pos;
+     }
+     
+     this.query = this.$route.params;
+     this.fetchArticles();
+   },
 
-        const data = res.data;
-        this.title = data.title;
-        this.time = data.time;
-        this.gid = data.gid;
-        this.board = data.board;
-        this.anony = data.anony;
-        this.popularReplies = data.popularReplies;
-        this.totalPage = data.pagination.total;
-        if (data.articles[0]['id'] == this.gid) {
-          [this.mainPost, ...this.posts] = data.articles;
-        } else {
-          this.posts = data.articles;
-          if (data.head && ! this.mainPost) {
-            this.mainPost = data.head;
-          }
-        }
-        document.title = this.title + ' -北邮人论坛';
-        this.cachePosts[page] = this.posts;
-        document.body.scrollTop = document.documentElement.scrollTop = 0;
-        this.isLoading = false;
+   methods: {
+     fetchArticles() {
+       this.isLoading = true;
+       const page = this.currentPage;
+       if (page in this.cachePosts) {
+         this.isLoading = false;
+         return this.posts = this.cachePosts[page];
+       }
+       api.getThread(this.query.board, this.query.id, { page }).then((res) => {
+         if (! res.success) {
+           // TODO
+           return false;
+         }
 
-        if (this.position > 0) {
-          this.$nextTick(() => {
-            let $dom = document.getElementById(this.position);
-            if (! $dom) {
-              return ;
-            }
+         const data = res.data;
+         this.title = data.title;
+         this.time = data.time;
+         this.gid = data.gid;
+         this.board = data.board;
+         this.anony = data.anony;
+         this.popularReplies = data.popularReplies;
+         this.totalPage = data.pagination.total;
 
-            $dom.scrollIntoView();
-            setTimeout(() => {
-              this.removeSelected = true;
-            }, 2000)
-          });
-        } 
-      });
-    },
+         this.pagePickerData = [
+           {
+             values: [...Array(this.totalPage).keys()].map(i => i + 1)
+           }
+         ]
 
-    jumpToBoard(name) {
-      this.$router.push('/board/' + name);
-    },
+         if (data.articles[0]['id'] == this.gid) {
+           [this.mainPost, ...this.posts] = data.articles;
+         } else {
+           this.posts = data.articles;
+           if (data.head && ! this.mainPost) {
+             this.mainPost = data.head;
+           }
+         }
+         document.title = this.title + ' -北邮人论坛';
+         this.cachePosts[page] = this.posts;
+         document.body.scrollTop = document.documentElement.scrollTop = 0;
+         this.isLoading = false;
 
-    jumpToUser(article) {
-      if (article.poster) {
-        this.$router.push('/user/' + article.poster.id);
-      }
-    },
+         if (this.position > 0) {
+           this.$nextTick(() => {
+             let $dom = document.getElementById(this.position);
+             if (! $dom) {
+               return ;
+             }
 
-    getPrevPage() {
-      if (this.currentPage <= 1) {
-        return false;
-      }
-      this.currentPage --;
-      this.fetchArticles();
-    },
+             $dom.scrollIntoView();
+             setTimeout(() => {
+               this.removeSelected = true;
+             }, 2000)
+           });
+         } 
+       });
+     },
 
-    getNextPage() {
-      if (this.currentPage >= this.totalPage) {
-        return false;
-      }
-      this.currentPage ++;
-      this.fetchArticles();
-    },
+     jumpToBoard(name) {
+       this.$router.push('/board/' + name);
+     },
 
-    showVote(){
-      this.showVoteChoice = !this.showVoteChoice;
-    },
+     jumpToUser(article) {
+       if (article.poster) {
+         this.$router.push('/user/' + article.poster.id);
+       }
+     },
 
-    voteup(article, index) {
-      api.voteup(this.board.name, article.id, {id:article.id}).then((res) => {
-        if (! res.success) {
-          // TODO 
-          return false;
-        }
-        article.voted = true;
-        article.voteddown = false;
-        article.voteup_count = res.data.up_count;
-        article.votedown_count = res.data.down_count;
-        if (index == -1) {
-          return this.mainPost = article;
-        }
-        this.posts[index] = article;
-      });
-    },
+     getPrevPage() {
+       if (this.currentPage <= 1) {
+         return false;
+       }
+       this.currentPage --;
+       this.fetchArticles();
+     },
 
-    votedown(article, index) {
-      api.votedown(this.board.name, article.id, { id: article.id }).then((res) => {
-        if (! res.success) {
-          // TODO
-          return false;
-        }
-        article.voted = false;
-        article.voteddown = true;
-        article.voteup_count = res.data.up_count;
-        article.votedown_count = res.data.down_count;
-        if (index == -1) {
-          return this.mainPost = article;
-        }
-        this.posts[index] = article;
-      });
-    },
+     getNextPage() {
+       if (this.currentPage >= this.totalPage) {
+         return false;
+       }
+       this.currentPage ++;
+       this.fetchArticles();
+     },
 
-    votedown_view(index) {
-      var article_dom = document.getElementById(index);
-      var username = article_dom.getElementsByClassName("content")[0].getElementsByTagName("h4");
-      username[0].style.display = "block";
-      username[1].style.display = "none";
-      article_dom.getElementsByClassName("article-body")[0].style.display = "block";
-      article_dom.getElementsByClassName("a-background")[0].style.display = "none";
-    },
+     hidePagePicker() {
+       this.pagePickerVisible = false
+     },
 
-    edit(article) {
-      let url = `type=edit&id=${article.id}&board=${this.board.name}`;
-      this.$router.push('/post?' + url);
-    },
+     showPagePicker() {
+       this.pagePickerVisible = true
+     },
 
-    reply(article) {
-      const title = encodeURIComponent(this.title);
-      let url = `type=reply&reid=${article.id}&board=${this.board.name}&retitle=${title}`;
-      this.$router.push('/post?' + url);
-    }
+     pageChanged(page) {
+       this.selectedPage = page
+     },
 
-  }
-}
+     getSelectedPage() {
+       this.hidePagePicker()
+       this.currentPage = this.selectedPage
+       this.fetchArticles();
+     },
+
+     getFirstPage() {
+       this.hidePagePicker()
+       this.currentPage = 1
+       this.fetchArticles();
+     },
+
+     getLastPage() {
+       this.hidePagePicker()
+       this.currentPage = this.totalPage
+       this.fetchArticles();
+     },
+
+     showVote(){
+       this.showVoteChoice = !this.showVoteChoice;
+     },
+
+     voteup(article, index) {
+       api.voteup(this.board.name, article.id, {id:article.id}).then((res) => {
+         if (! res.success) {
+           // TODO 
+           return false;
+         }
+         article.voted = true;
+         article.voteddown = false;
+         article.voteup_count = res.data.up_count;
+         article.votedown_count = res.data.down_count;
+         if (index == -1) {
+           return this.mainPost = article;
+         }
+         this.posts[index] = article;
+       });
+     },
+
+     votedown(article, index) {
+       api.votedown(this.board.name, article.id, { id: article.id }).then((res) => {
+         if (! res.success) {
+           // TODO
+           return false;
+         }
+         article.voted = false;
+         article.voteddown = true;
+         article.voteup_count = res.data.up_count;
+         article.votedown_count = res.data.down_count;
+         if (index == -1) {
+           return this.mainPost = article;
+         }
+         this.posts[index] = article;
+       });
+     },
+
+     votedown_view(index) {
+       var article_dom = document.getElementById(index);
+       var username = article_dom.getElementsByClassName("content")[0].getElementsByTagName("h4");
+       username[0].style.display = "block";
+       username[1].style.display = "none";
+       article_dom.getElementsByClassName("article-body")[0].style.display = "block";
+       article_dom.getElementsByClassName("a-background")[0].style.display = "none";
+     },
+
+     edit(article) {
+       let url = `type=edit&id=${article.id}&board=${this.board.name}`;
+       this.$router.push('/post?' + url);
+     },
+
+     reply(article) {
+       const title = encodeURIComponent(this.title);
+       let url = `type=reply&reid=${article.id}&board=${this.board.name}&retitle=${title}`;
+       this.$router.push('/post?' + url);
+     }
+
+   }
+ }
 </script>
 
 <style scoped>
-h4 {
-    margin: 0;
-}
-.container {
-    padding: 12px 12px;
-    background-color: #fff;
-}
-.poster.media {
-    margin: 8px 0;
-}
-.gender-m {
-    color: #57e5d5;
-}
-.gender-f {
-    color: #ff6693;
-}
-.article-body.content {
-    color: black;
-}
-.content {
-  overflow-wrap: break-word;
-  word-wrap: break-word;
+ h4 {
+   margin: 0;
+ }
+ .container {
+   padding: 12px 12px;
+   background-color: #fff;
+ }
+ .poster.media {
+   margin: 8px 0;
+ }
+ .gender-m {
+   color: #57e5d5;
+ }
+ .gender-f {
+   color: #ff6693;
+ }
+ .article-body.content {
+   color: black;
+ }
+ .content {
+   overflow-wrap: break-word;
+   word-wrap: break-word;
 
-  word-break: break-word;
+   word-break: break-word;
 
-  -ms-hyphens: auto;
-  -moz-hyphens: auto;
-  -webkit-hyphens: auto;
-  hyphens: auto;
-}
+   -ms-hyphens: auto;
+   -moz-hyphens: auto;
+   -webkit-hyphens: auto;
+   hyphens: auto;
+ }
 
-.tread-header {
-    height: 60px;
-}
-.paginate {
-    text-align: center;
-    margin: 1px;
-}
-.paginate-items {
-  margin-left: 0;
-  margin-right: 0;
-}
-.reply-tag {
-    margin: 16px 0;
-}
-.reply-tag b {
-    display: inline-block;
-    height: 1px;
-    width: 79%;
-    background: #ddd;
-    float: right;
-    margin-top: 13px;
-}
-.media-right a {
-    color: #4a4a4a;
-}
-.voted {
-    color: #00d1b2;
-}
-.selected-content {
-    background-color: #eaeaec;
-}
-.remove-selected {
-    background-color: #fff;
-}
-.up,.down {   
-    font-size: 10px;
-    line-height:10px;
-}
-.up {
-    position:absolute;
-    top:30%;
-}
-.down {
-    position:relative;
-    top:15%;
-}
+ .tread-header {
+   height: 60px;
+ }
+ .paginate {
+   text-align: center;
+   margin: 1px;
+ }
+ .paginate-items {
+   margin-left: 0;
+   margin-right: 0;
+ }
+ .reply-tag {
+   margin: 16px 0;
+ }
+ .reply-tag b {
+   display: inline-block;
+   height: 1px;
+   width: 79%;
+   background: #ddd;
+   float: right;
+   margin-top: 13px;
+ }
+ .media-right a {
+   color: #4a4a4a;
+ }
+ .voted {
+   color: #00d1b2;
+ }
+ .selected-content {
+   background-color: #eaeaec;
+ }
+ .remove-selected {
+   background-color: #fff;
+ }
+ .up,.down {   
+   font-size: 10px;
+   line-height:10px;
+ }
+ .up {
+   position:absolute;
+   top:30%;
+ }
+ .down {
+   position:relative;
+   top:15%;
+ }
+ .picker-backdrop {
+   position: fixed;
+ }
 </style>
