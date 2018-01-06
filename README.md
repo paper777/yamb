@@ -43,8 +43,6 @@ cd www && link -sf ../app/modules/Yamb/www/dist/yamb .
 
 forward article
 
-vote down
-
 ...
 
 ### User profile page
