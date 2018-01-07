@@ -30,7 +30,8 @@ module.exports = {
     assetsPublicPath: '/',
       proxyTable: {
           '/n/b/**': {
-              target: 'http://m.also777.com/',
+              target: 'https://bbs.byr.cn',
+              //target: 'http://m.also777.com/',
               pathRewrite: {
                   '/n/b': '/n/b'
               },

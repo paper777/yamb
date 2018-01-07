@@ -165,8 +165,8 @@
     </section>
 
     <section class="paginate" v-if="! isLoading">
-      <picker v-model="pagePickerVisible" :data-items="pagePickerData" @change="pageChanged">
-        <div class="top-content" slot="top-content">
+      <picker :data="pagePickerData" @change="pageChanged" ref="pagePicker">
+        <div slot="header">
           <div class="card">
             <header class="columns is-mobile paginate-items">
               <div class="column"> <a @click="hidePagePicker">取消</a> </div>
@@ -175,7 +175,6 @@
               <div class="column"> <a @click="getLastPage">末页</a> </div>
               <div class="column"> <a @click="getSelectedPage">确认</a> </div>
             </header>
-   
           </div>
         </div>
       </picker>
@@ -216,6 +215,7 @@
 
 <script>
  import * as api from 'api/thread'
+ import Picker from 'components/Picker'
 
  export default {
    data () {
@@ -260,6 +260,10 @@
      }
    },
 
+   components: {
+     Picker
+   },
+
    watch: {
    },
 
@@ -301,11 +305,12 @@
          this.popularReplies = data.popularReplies;
          this.totalPage = data.pagination.total;
 
-         this.pagePickerData = [
-           {
-             values: [...Array(this.totalPage).keys()].map(i => i + 1)
+         this.pagePickerData = [...Array(this.totalPage).keys()].map(i => {
+           return {
+             value: i + 1,
+             label: '第' + (i + 1) + '页'
            }
-         ]
+         })
 
          if (data.articles[0]['id'] == this.gid) {
            [this.mainPost, ...this.posts] = data.articles;
@@ -318,7 +323,11 @@
          document.title = this.title + ' -北邮人论坛';
          this.cachePosts[page] = this.posts;
          document.body.scrollTop = document.documentElement.scrollTop = 0;
+
          this.isLoading = false;
+         this.$nextTick(() => {
+             this.$refs.pagePicker.setData(this.pagePickerData)
+         })
 
          if (this.position > 0) {
            this.$nextTick(() => {
@@ -364,14 +373,16 @@
 
      hidePagePicker() {
        this.pagePickerVisible = false
+       this.$refs.pagePicker.hide()
      },
 
      showPagePicker() {
        this.pagePickerVisible = true
+       this.$refs.pagePicker.show()
      },
 
      pageChanged(page) {
-       this.selectedPage = page
+       this.selectedPage = page.value
      },
 
      getSelectedPage() {
@@ -531,8 +542,5 @@
  .down {
    position:relative;
    top:15%;
- }
- .picker-backdrop {
-   position: fixed;
  }
 </style>
