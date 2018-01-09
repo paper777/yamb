@@ -164,7 +164,6 @@ export default {
 
     newPost() {
       let url = `/post?type=new&board=${this.query.board}`;
-      console.log(url);
       this.$router.push(url);
     }
   }

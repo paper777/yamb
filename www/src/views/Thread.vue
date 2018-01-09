@@ -31,19 +31,19 @@
             </div>
             <div class="media-right">
               <span>
-                <a v-if="mainPost.op" @click="edit(mainPost)"><i class="iconfont icon-edit"></i></a>
+                <a v-if="mainPost && mainPost.op" @click="edit(mainPost)"><i class="iconfont icon-edit"></i></a>
               </span>
               <span>
                 <a @click="reply(mainPost)"><i class="iconfont icon-comments"></i></a>
               </span>
-              <span>
+              <span v-if="mainPost">
                 <a v-if="! mainPost.voted" @click="voteup(mainPost,-1)">
                   <i class="iconfont icon-good"></i>
                 </a>
                 <i v-else class="iconfont icon-good voted"></i>
                 {{ mainPost.voteup_count }}
               </span>
-              <span>
+              <span v-if="mainPost">
                 <a v-if="! mainPost.voteddown" @click="votedown(mainPost, -1)">
                   <i class="iconfont icon-bad"></i>
                 </a>
@@ -55,9 +55,7 @@
           <div class="article-body content"  v-html="mainPost.content"> </div>
         </div>
         <div class="oops" v-else-if="! mainPost">
-          // TODO threads without header
-          <br>
-          // CONTRIBUTING: <a href="https://github.com/paper777/yamb">Go To Github Page</a>
+          <span>O0o0Ops...内容不见了</span>
           <hr>
         </div>
 
@@ -83,7 +81,7 @@
               </div>
               <div class="media-right">
               <span>
-                <a v-if="mainPost.op" @click="edit(mainPost)"><i class="iconfont icon-edit"></i></a>
+                <a v-if="mainPost && mainPost.op" @click="edit(mainPost)"><i class="iconfont icon-edit"></i></a>
               </span>
                 <span>
                   <a @click="reply(mainPost)"><i class="iconfont icon-comments"></i></a>
@@ -131,7 +129,7 @@
               </div>
               <div class="media-right">
                 <span>
-                  <a v-if="mainPost.op" @click="edit(article)"><i class="iconfont icon-edit"></i></a>
+                  <a v-if="mainPost && mainPost.op" @click="edit(article)"><i class="iconfont icon-edit"></i></a>
                 </span>
                 <span>
                   <a @click="reply(article)"><i class="iconfont icon-comments"></i></a>
@@ -179,18 +177,20 @@
         </div>
       </picker>
 
-      <div class="card" v-show="showVoteChoice" style="margin-bottom: 10px;">
-        <header class="columns  is-mobile paginate-items">
-          <div class="column">
-            <a v-if="mainPost && ! mainPost.voted" @click="voteup(mainPost, -1);showVote();">赞 {{ mainPost.voteup_count }}</a>
-            <a v-else @click="showVote()">赞 {{ mainPost.voteup_count }}</a>
-          </div>
-          <div class="column">
-            <a v-if="mainPost && ! mainPost.voteddown" @click="votedown(mainPost, -1);showVote();">踩 {{ mainPost.votedown_count }}</a>
-            <a v-else @click="showVote()">踩 {{ mainPost.votedown_count }}</a>
-          </div>
-        </header>
-      </div>
+      <template v-if="mainPost">
+        <div class="card" v-show="showVoteChoice" style="margin-bottom: 10px;">
+          <header class="columns  is-mobile paginate-items">
+            <div class="column">
+              <a v-if="mainPost && ! mainPost.voted" @click="voteup(mainPost, -1);showVote();">赞 {{ mainPost.voteup_count }}</a>
+              <a v-else @click="showVote()">赞 {{ mainPost.voteup_count }}</a>
+            </div>
+            <div class="column">
+              <a v-if="mainPost && ! mainPost.voteddown" @click="votedown(mainPost, -1);showVote();">踩 {{ mainPost.votedown_count }}</a>
+              <a v-else @click="showVote()">踩 {{ mainPost.votedown_count }}</a>
+            </div>
+          </header>
+        </div>
+      </template>
 
       <div class="card">
         <header class="columns is-mobile paginate-items">
@@ -200,7 +200,7 @@
                 <i class="iconfont icon-less up"></i>
                 <i class="iconfont icon-moreunfold down"></i>
               </span>
-              赞 {{ mainPost.voteup_count }}
+              赞 {{ mainPost ? mainPost.voteup_count : '0' }}
             </a>
           </div>
           <div class="column"> <a @click="getPrevPage">上页</a> </div>
@@ -225,7 +225,7 @@
          id: ''
        },
 
-       position: 0,
+       position: null,
 
        isLoading: true,
 
@@ -319,6 +319,10 @@
            if (data.head && ! this.mainPost) {
              this.mainPost = data.head;
            }
+
+           if (! this.mainPost && this.currentPage == 1) {
+             this.posts.map(article => article.pos++)
+           }
          }
          document.title = this.title + ' -北邮人论坛';
          this.cachePosts[page] = this.posts;
@@ -403,8 +407,11 @@
        this.fetchArticles();
      },
 
-     showVote(){
-       this.showVoteChoice = !this.showVoteChoice;
+     showVote() {
+       if (! this.mainPost) {
+         return false
+       }
+       this.showVoteChoice = !this.showVoteChoice
      },
 
      voteup(article, index) {
@@ -456,8 +463,9 @@
      },
 
      reply(article) {
+       let id = article ? article.id : this.gid
        const title = encodeURIComponent(this.title);
-       let url = `type=reply&reid=${article.id}&board=${this.board.name}&retitle=${title}`;
+       let url = `type=reply&reid=${id}&board=${this.board.name}&retitle=${title}`;
        this.$router.push('/post?' + url);
      }
 
@@ -524,6 +532,9 @@
  }
  .voted {
    color: #00d1b2;
+ }
+ .oops {
+   background-color: #f2f2f2;
  }
  .selected-content {
    background-color: #eaeaec;
