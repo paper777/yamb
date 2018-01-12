@@ -46,13 +46,13 @@ export default {
 }
 
 @keyframes fade-in {
-    0%   { opacity: 0; bottom: 3rem; }
-    100% { opacity: 1; bottom: 4rem; }
+    0%   { opacity: 0; bottom: 0rem; }
+    100% { opacity: 1; bottom: 1rem; }
 }
 
 @keyframes fade-out {
-    0%   { opacity: 1; bottom: 4rem; }
-    100% { opacity: 0; bottom: 3rem;}
+    0%   { opacity: 1; bottom: 1rem; }
+    100% { opacity: 0; bottom: 0rem;}
 }
 
 .float-button-section {
@@ -61,7 +61,7 @@ export default {
     border-radius: 50%;
     background: #00d1b2;
     position: fixed;
-    bottom: 4rem;
+    bottom: 1rem;
     right: 2rem;
     box-shadow: 0px 2px 5px #666;
 }
