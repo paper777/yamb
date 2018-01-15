@@ -162,7 +162,7 @@
       </div>
     </section>
 
-    <section class="paginate" v-if="! isLoading">
+    <section class="paginate" v-show="! isLoading">
       <picker :data="pagePickerData" @change="pageChanged" ref="pagePicker">
         <div slot="header">
           <div class="card">
@@ -330,7 +330,7 @@
 
          this.isLoading = false;
          this.$nextTick(() => {
-             this.$refs.pagePicker.setData(this.pagePickerData)
+           this.$refs.pagePicker.setData(this.pagePickerData)
          })
 
          if (this.position > 0) {
@@ -390,6 +390,10 @@
      },
 
      getSelectedPage() {
+       if (! this.$refs.pagePicker.canConfirm()) {
+         return
+       }
+
        this.hidePagePicker()
        this.currentPage = this.selectedPage
        this.fetchArticles();
@@ -511,6 +515,9 @@
  .paginate {
    text-align: center;
    margin: 1px;
+ }
+ .paginate a:hover {
+   color: #00d1b2;
  }
  .paginate-items {
    margin-left: 0;

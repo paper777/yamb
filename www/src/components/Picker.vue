@@ -31,6 +31,7 @@
    data () {
      return {
        visible: false,
+       selectedIndex: null,
        dataItems: [],
        wheel: null
      }
@@ -41,9 +42,6 @@
        type: Array,
        required: true
      }
-   },
-
-   computed: {
    },
 
    watch: {
@@ -76,6 +74,10 @@
 
        this.wheel.disable()
 
+     },
+
+     canConfirm() {
+       return this.wheel && ! this.wheel.isInTransition
      },
 
      setData(data) {
