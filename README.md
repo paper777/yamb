@@ -8,7 +8,7 @@ Yamb is also a project for BYRs to learn front end programming
 
 see https://bbs.byr.cn/n
 
-![yamb-screenshot](http://ovnevollz.bkt.clouddn.com/yamb-screenshot.png)
+![yamb-screenshot](http://ovnevollz.bkt.clouddn.com/yamb-screenshot2.png)
 
 
 
