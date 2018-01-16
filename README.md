@@ -26,13 +26,13 @@ $export['modules']['yamb']['domain'] = 'm';
 
 ### 2. add redirect rule to app/plugins/Redirect.php
 
-### 3. add submoduel
+### 3. add submodule
 $ git submodule add git@github.com:paper777/yamb.git app/modules/Yamb
 
 ### 4. build
 $ ./app/moduels/Yamb/scripts/build
 
-### 5. add asset link
+### 5. add assets link
 cd www && link -sf ../app/modules/Yamb/www/dist/yamb .
 
 ```
