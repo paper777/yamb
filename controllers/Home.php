@@ -1,14 +1,24 @@
 <?php
-class HomeController extends NF_YambController {
 
+/*
+ * Yamb - A module for NForum, a replacement of Mobile Module
+ *
+ * @auther    paper777 <wuzhyy@163.com>
+ *
+ */
+
+class HomeController extends NF_YambController
+{
     const PAGE_SIZE = 20;
 
-    public function indexAction() { 
+    public function indexAction()
+    {
         $this->requestLogin();
         load(['model/widget', 'inc/wrapper']);
+
         try {
             $widget = Widget::getInstance('topten');
-        } catch(WidgetNullException $e) {
+        } catch (WidgetNullException $e) {
             $this->fail($e->getMessage());
         }
 
@@ -17,30 +27,30 @@ class HomeController extends NF_YambController {
 
         $list = $widget->wGetList();
 
-        if (! array($list['v'])) {
+        if (![$list['v']]) {
             return $this->fail('内部错误');
         }
 
         $articles = [];
-        load(array('model/board', 'model/threads'));
+        load(['model/board', 'model/threads']);
         foreach ($list['v'] as $v) {
             if (empty($v['url'])) {
                 continue;
             }
-            
-            $ret = [];
-            preg_match("|^/article/(.*?)/(.*?)$|", $v['url'], $ret);
 
-            if(empty($ret[1]) || empty($ret[2])) {
+            $ret = [];
+            preg_match('|^/article/(.*?)/(.*?)$|', $v['url'], $ret);
+
+            if (empty($ret[1]) || empty($ret[2])) {
                 continue;
             }
 
             $board = rawurldecode($ret[1]);
-            $id = (int)$ret[2];
+            $id = (int) $ret[2];
 
             $text = $v['text'];
-            $text = preg_replace("|<[^>]*?>|", '', $text);
-            if(preg_match("/\((\d+)\)$/", $text, $counter)) {
+            $text = preg_replace('|<[^>]*?>|', '', $text);
+            if (preg_match("/\((\d+)\)$/", $text, $counter)) {
                 $counter = $counter[1];
             } else {
                 $counter = 0;
@@ -50,18 +60,20 @@ class HomeController extends NF_YambController {
                 $article = Threads::getInstance($id, Board::getInstance($board));
                 $thread = $wrapper->feed($article);
                 $articles[] = $thread;
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 continue;
             }
         }
+
         return $this->success($articles);
     }
 
-    public function timelineAction() {
+    public function timelineAction()
+    {
         $this->requestLogin();
         load(['model/favorpost', 'inc/pagination', 'inc/wrapper', 'inc/ubb']);
 
-        $count = c("pagination.threads");
+        $count = c('pagination.threads');
         $page = isset($this->params['url']['page']) ? (int) $this->params['url']['page'] : 1;
 
         $u = User::getInstance();
@@ -72,12 +84,12 @@ class HomeController extends NF_YambController {
 
         $wrapper = Wrapper::getInstance();
         $data = [
-            'article' => [],
-            'pagination' => $wrapper->page($pagination)
+            'article'    => [],
+            'pagination' => $wrapper->page($pagination),
         ];
 
         $articles = $pagination->getPage($page);
-        foreach($articles as $article){
+        foreach ($articles as $article) {
             $thread = $wrapper->feed($article);
             $data['article'][] = $thread;
         }
@@ -85,11 +97,12 @@ class HomeController extends NF_YambController {
         return $this->success($data);
     }
 
-    public function favAction() {
+    public function favAction()
+    {
         $this->requestLogin();
-        load("model/favor");
+        load('model/favor');
 
-        if (! empty($this->params['level'])) {
+        if (!empty($this->params['level'])) {
             $level = (int) $this->params['level'];
         } else {
             $level = 0;
@@ -98,7 +111,7 @@ class HomeController extends NF_YambController {
         try {
             $favBoards = Favor::getInstance($level);
         } catch (FavorNullException $e) {
-            $this0>fail('内部错误');
+            $this0 > fail('内部错误');
         }
 
         $parent = $favBoards->getParent();
@@ -112,18 +125,20 @@ class HomeController extends NF_YambController {
         $_boards = $favBoards->getAll();
         foreach ($_boards as $key => $board) {
             $boards[] = [
-                'name' => $board->NAME,
-                'desc' => $board->DESC,
-                'dir' => $board->isDir(),
-                'pos' => $board->NPOS,
-                'new' => $board->getTodayNum(),
-                'level' => $board->BID
+                'name'  => $board->NAME,
+                'desc'  => $board->DESC,
+                'dir'   => $board->isDir(),
+                'pos'   => $board->NPOS,
+                'new'   => $board->getTodayNum(),
+                'level' => $board->BID,
             ];
         }
+
         return $this->success(compact('parent', 'boards'));
     }
 
-    public function bannerAction() {
+    public function bannerAction()
+    {
         $this->requestLogin();
         load('model/adv');
         $res = Adv::getMobileBanner();
@@ -131,30 +146,35 @@ class HomeController extends NF_YambController {
         $banners = [];
         $base = c('site.static');
 
-        foreach($res as $b) {
+        foreach ($res as $b) {
             $banners[] = [
-                'image_url'=> $base . $b['file'],
-                'intro' => $b['remark'],
-                'url' => $b['url']
+                'image_url'=> $base.$b['file'],
+                'intro'    => $b['remark'],
+                'url'      => $b['url'],
             ];
         }
         $data = [
-            'banners' => $banners
+            'banners' => $banners,
         ];
+
         return $this->success($data);
     }
 
-    public function backToNforumAction() {
+    public function backToNforumAction()
+    {
         load('inc/cookie');
         $cookie = Cookie::getInstance();
         $cookie->write('site', 'nforum');
+
         return $this->success();
     }
 
-    public function backToYambAction() {
+    public function backToYambAction()
+    {
         load('inc/cookie');
         $cookie = Cookie::getInstance();
         $cookie->write('site', 'yamb');
+
         return $this->success();
     }
 }

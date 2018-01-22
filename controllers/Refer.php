@@ -1,18 +1,28 @@
 <?php
-class ReferController extends NF_YambController {
 
-    public function init(){
+/*
+ * Yamb - A module for NForum, a replacement of Mobile Module
+ *
+ * @auther    paper777 <wuzhyy@163.com>
+ *
+ */
+
+class ReferController extends NF_YambController
+{
+    public function init()
+    {
         parent::init();
-        if (! c('refer.enable')) {
+        if (!c('refer.enable')) {
             return $this->fail('Refer component disabled.');
         }
         $this->requestLogin();
     }
 
-    public function indexAction() {
+    public function indexAction()
+    {
         load(['model/refer', 'inc/pagination']);
 
-        if (! isset($this->params['type'])) {
+        if (!isset($this->params['type'])) {
             $type = 'reply';
         } else {
             $type = $this->params['type'];
@@ -20,7 +30,7 @@ class ReferController extends NF_YambController {
 
         try {
             $refer = new Refer(User::getInstance(), $type);
-        } catch(ReferNullException $e) {
+        } catch (ReferNullException $e) {
             return $this->fail('no refer found');
         }
 
@@ -31,16 +41,16 @@ class ReferController extends NF_YambController {
         $articles = $pagination->getPage($page);
 
         $info = [];
-        foreach($articles as $v) {
+        foreach ($articles as $v) {
             $data = [
-                "index" => $v['INDEX'],
-                "id" => $v['ID'],
-                "group_id" => $v['GROUP_ID'],
-                "board" => $v['BOARD'],
-                "user" => $v['USER'],
-                "title" => nforum_html($v['TITLE']),
-                "time" => $this->formatTime($v['TIME']),
-                "read" => ($v['FLAG'] === Refer::$FLAG_READ)
+                'index'    => $v['INDEX'],
+                'id'       => $v['ID'],
+                'group_id' => $v['GROUP_ID'],
+                'board'    => $v['BOARD'],
+                'user'     => $v['USER'],
+                'title'    => nforum_html($v['TITLE']),
+                'time'     => $this->formatTime($v['TIME']),
+                'read'     => ($v['FLAG'] === Refer::$FLAG_READ),
             ];
 
             try {
@@ -49,7 +59,6 @@ class ReferController extends NF_YambController {
                 $article = $threads->getArticleById((int) $v['ID']);
             } catch (Exception $e) {
                 continue;
-
             }
 
             if ($article == null) {
@@ -70,7 +79,7 @@ class ReferController extends NF_YambController {
 
             //// remove bottom lines
             //$s = (($pos = strpos($content, "<br/><br/>")) === false) ? 0 : $pos + 10;
-            //$e = (($pos = strpos($content, "<br/>--<br/>")) === false) 
+            //$e = (($pos = strpos($content, "<br/>--<br/>")) === false)
             //    ? strlen($content)
             //    : $pos + 7;
             //$content = preg_replace(
@@ -81,7 +90,7 @@ class ReferController extends NF_YambController {
 
             //// parse attachments
             //$content = $article->parseAtt($content, 'middle');
-            if(c("ubb.parse")) {
+            if (c('ubb.parse')) {
                 load('inc/ubb');
                 $content = XUBB::parse($content);
             }
@@ -91,66 +100,70 @@ class ReferController extends NF_YambController {
             unset($data);
         }
         $article = $info;
+
         return $this->success(compact('article', 'pagination', 'description'));
     }
 
-    public function readAction() {
+    public function readAction()
+    {
         load(['model/refer', 'inc/wrapper']);
 
-        if (! isset($this->params['type'])) {
+        if (!isset($this->params['type'])) {
             $type = 'reply';
         } else {
             $type = $this->params['type'];
         }
 
-        if (! isset($this->params['url']['index'])) {
+        if (!isset($this->params['url']['index'])) {
             return $this->fail('index not defined');
         }
         $index = $this->params['url']['index'];
 
         try {
             $refer = new Refer(User::getInstance(), $type);
-        } catch(ReferNullException $e) {
+        } catch (ReferNullException $e) {
             return $this->fail('no refer found');
         }
 
         if ('all' == $index) {
             $refer->setRead();
+
             return $this->success(true);
-        } 
+        }
 
         $index = intval($index);
         $r = $refer->getRefer($index);
         if (null === $r) {
             return $this->fail('refer not found');
-        } 
+        }
         $refer->setRead($index);
+
         return $this->success(true);
     }
 
-    public function deleteAction() {
+    public function deleteAction()
+    {
         load(['model/refer']);
 
-        if (! isset($this->params['type'])) {
+        if (!isset($this->params['type'])) {
             $type = 'reply';
         } else {
             $type = $this->params['type'];
         }
 
-        if (! isset($this->params['url']['index'])) {
+        if (!isset($this->params['url']['index'])) {
             return $this->fail('index not defined');
         }
         $index = $this->params['url']['index'];
 
         try {
             $refer = new Refer(User::getInstance(), $type);
-        } catch(ReferNullException $e) {
+        } catch (ReferNullException $e) {
             return $this->fail('no refer found');
         }
 
         $refer->delete(intval($index));
+
         return $this->success(true);
     }
-
 }
-

@@ -1,46 +1,54 @@
 <?php
+
+/*
+ * Yamb - A module for NForum, a replacement of Mobile Module
+ *
+ * @auther    paper777 <wuzhyy@163.com>
+ *
+ */
+
 $base = c('modules.yamb.base');
 
-$api = $base . '/b';
+$api = $base.'/b';
 
-/** home page */
-$export[] = array($api . '/banner', array('controller' => 'home', 'module' => 'yamb', 'action' => 'banner'));
-$export[] = array($api . '/home/topten', array('controller' => 'home', 'module' => 'yamb', 'action' => 'index'));
-$export[] = array($api . '/home/timeline', array('controller' => 'home', 'module' => 'yamb', 'action' => 'timeline'));
-$export[] = array($api . '/home/fav/:level', array('controller' => 'home', 'module' => 'yamb', 'action' => 'fav'));
-$export[] = array($api . '/back-to-nforum', array('controller' => 'home', 'module' => 'yamb', 'action' => 'backToNforum'));
-$export[] = array($api . '/back-to-yamb', array('controller' => 'home', 'module' => 'yamb', 'action' => 'backToYamb'));
+/* home page */
+$export[] = [$api.'/banner', ['controller' => 'home', 'module' => 'yamb', 'action' => 'banner']];
+$export[] = [$api.'/home/topten', ['controller' => 'home', 'module' => 'yamb', 'action' => 'index']];
+$export[] = [$api.'/home/timeline', ['controller' => 'home', 'module' => 'yamb', 'action' => 'timeline']];
+$export[] = [$api.'/home/fav/:level', ['controller' => 'home', 'module' => 'yamb', 'action' => 'fav']];
+$export[] = [$api.'/back-to-nforum', ['controller' => 'home', 'module' => 'yamb', 'action' => 'backToNforum']];
+$export[] = [$api.'/back-to-yamb', ['controller' => 'home', 'module' => 'yamb', 'action' => 'backToYamb']];
 
-/** user */
-$export[] = array($api . '/auth/:action', array('controller' => 'auth', 'module' => 'yamb'));
-$export[] = array($api . '/user/profile', array('controller' => 'user', 'module' => 'yamb', 'action' => 'profile'));
-$export[] = array($api . '/user/query/:username', array('controller' => 'user', 'module' => 'yamb', 'action' => 'query'));
+/* user */
+$export[] = [$api.'/auth/:action', ['controller' => 'auth', 'module' => 'yamb']];
+$export[] = [$api.'/user/profile', ['controller' => 'user', 'module' => 'yamb', 'action' => 'profile']];
+$export[] = [$api.'/user/query/:username', ['controller' => 'user', 'module' => 'yamb', 'action' => 'query']];
 
-/** article */
-$export[] = array($api . '/article/:name/:action/:gid', array('controller' => 'article', 'module' => 'yamb', 'action' => null), array('gid' => '\d+'));
-$export[] = array($api . '/article/:name/:action', array('controller' => 'article', 'module' => 'yamb'));
+/* article */
+$export[] = [$api.'/article/:name/:action/:gid', ['controller' => 'article', 'module' => 'yamb', 'action' => null], ['gid' => '\d+']];
+$export[] = [$api.'/article/:name/:action', ['controller' => 'article', 'module' => 'yamb']];
 
 // attachement
-$export[] = array($api . '/attachment/:name/:action/:id', array('controller' => 'attachment', 'module' => 'yamb', 'action' => null, 'id' => null), array('id' => '\d+'));
+$export[] = [$api.'/attachment/:name/:action/:id', ['controller' => 'attachment', 'module' => 'yamb', 'action' => null, 'id' => null], ['id' => '\d+']];
 
-/** section */
-$export[] = array($api. '/section', array('controller' => 'section', 'module' => 'yamb', 'action' => 'index'));
-$export[] = array($api. '/section/:name', array('controller' => 'section', 'module' => 'yamb', 'action' => 'search'));
+/* section */
+$export[] = [$api.'/section', ['controller' => 'section', 'module' => 'yamb', 'action' => 'index']];
+$export[] = [$api.'/section/:name', ['controller' => 'section', 'module' => 'yamb', 'action' => 'search']];
 
-/** board */
-$export[] = array($api . '/board/:name', array('controller' => 'board', 'module' => 'yamb'));
+/* board */
+$export[] = [$api.'/board/:name', ['controller' => 'board', 'module' => 'yamb']];
 
-/** fav */
-$export[] = array($api . '/fav/op', array('controller' => 'fav', 'module' => 'yamb', 'action' => 'change'));
+/* fav */
+$export[] = [$api.'/fav/op', ['controller' => 'fav', 'module' => 'yamb', 'action' => 'change']];
 
-/** refer */
-$export[] = array($api . '/refer/:type/:action', array('controller' => 'refer', 'module' => 'yamb', 'action' => null));
+/* refer */
+$export[] = [$api.'/refer/:type/:action', ['controller' => 'refer', 'module' => 'yamb', 'action' => null]];
 
-/** mail */
-$export[] = array($api . '/mail/send', array('controller' => 'mail', 'module' => 'yamb', 'action' => 'send'));
-$export[] = array($api . '/mail/:type/:action/:num', array('controller' => 'mail', 'module' => 'yamb', 'num' => null), array('num'=> '\d+'));
-$export[] = array($api . '/mail/:type', array('controller' => 'mail', 'module' => 'yamb', 'action' => 'index', 'type' => null));
+/* mail */
+$export[] = [$api.'/mail/send', ['controller' => 'mail', 'module' => 'yamb', 'action' => 'send']];
+$export[] = [$api.'/mail/:type/:action/:num', ['controller' => 'mail', 'module' => 'yamb', 'num' => null], ['num'=> '\d+']];
+$export[] = [$api.'/mail/:type', ['controller' => 'mail', 'module' => 'yamb', 'action' => 'index', 'type' => null]];
 
-/** vue */
-$export[] = array($base, array('controller' => 'index', 'module' => 'yamb'));
-$export[] = array($base . '/:vue', array('controller' => 'index', 'module' => 'yamb', array('vue' => '[\/\w\.-]*')));
+/* vue */
+$export[] = [$base, ['controller' => 'index', 'module' => 'yamb']];
+$export[] = [$base.'/:vue', ['controller' => 'index', 'module' => 'yamb', ['vue' => '[\/\w\.-]*']]];
