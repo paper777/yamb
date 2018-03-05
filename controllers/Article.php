@@ -428,6 +428,9 @@ class ArticleController extends NF_YambController
                 $article->reply($subject, $content, $sig, $email, $anony, $outgo, $this->tex, $this->fromType);
             }
         } catch (ArticlePostException $e) {
+            if ($e->getCode() == Ecode::$USER_PHONE_NOT_VERIFIED) {
+                return $this->fail('请使用电脑端认证手机号');
+            }
             return $this->fail('操作失败');
         }
 
