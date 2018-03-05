@@ -54,6 +54,10 @@
 
     </section>
 
+    <div class="tool-tip content">
+      <blockquote>未认证手机号的用户请使用电脑版在控制面板处进行手机号验证</blockquote>
+    </div>
+
     <div class="loading-section" v-if="pageLoading">
         <div class="loading ball-pulse"><div></div><div></div><div></div></div>
     </div>
@@ -509,4 +513,7 @@ export default {
     text-align: center;
 
 }
+ .tool-tip {
+   margin: 1.5rem 0.5rem 0 0.5rem;
+ }
 </style>
