@@ -45,10 +45,14 @@ class FavController extends NF_YambController
                 try {
                     $val = Board::getInstance($val);
                     if (!$fav->add($val, Favor::$BOARD)) {
-                        $this->fail('收藏失败');
+                        $this->fail('收藏版面失败');
                     }
-                } catch (Exception $e) {
+                } catch (FavorNullException $e) {
                     $this->fail('版面不存在');
+                } catch (FavHasBoardException $e) {
+                    $this->fail('版面已被收藏');
+                } catch (Exception $e) {
+                    $this->fail('收藏版面失败');
                 }
                 break;
             case 'ad':
