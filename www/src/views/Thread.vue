@@ -62,7 +62,7 @@
 
         <div class="popular-replies" v-if="currentPage == 1 && popularReplies.length">
           <div class="reply-tag">
-            <span class="tag is-danger">精彩回复</span> 
+            <span class="tag is-danger">精彩回复</span>
             <b></b>
           </div>
           <div class="post" v-for="(article, index) in popularReplies" :key="index">
@@ -216,6 +216,7 @@
 <script>
  import * as api from 'api/thread'
  import Picker from 'components/Picker'
+ import marked from 'marked'
 
  export default {
    data () {
@@ -277,7 +278,7 @@
        this.currentPage = parseInt(location.pos / 10) + 1;
        this.position = location.pos;
      }
-     
+
      this.query = this.$route.params;
      this.fetchArticles();
    },
@@ -311,7 +312,16 @@
              label: '第' + (i + 1) + '页'
            }
          })
-
+         //process markdown content
+         for (let i = 0; i < data.articles.length; ++i) {
+           let mainPostContent = document.createElement('div');
+           mainPostContent.innerHTML = data.articles[i].content;
+           let markdownNode = mainPostContent.querySelectorAll('pre.markdown');
+           if (markdownNode > 0) {
+             data.articles[i].content = marked(markdownNode[0].innerText);
+           }
+         }
+         //process done
          if (data.articles[0]['id'] == this.gid) {
            [this.mainPost, ...this.posts] = data.articles;
          } else {
@@ -324,6 +334,7 @@
              this.posts.map(article => article.pos++)
            }
          }
+
          document.title = this.title + ' -北邮人论坛';
          this.cachePosts[page] = this.posts;
          document.body.scrollTop = document.documentElement.scrollTop = 0;
@@ -345,7 +356,7 @@
                this.removeSelected = true;
              }, 2000)
            });
-         } 
+         }
        });
      },
 
@@ -421,7 +432,7 @@
      voteup(article, index) {
        api.voteup(this.board.name, article.id, {id:article.id}).then((res) => {
          if (! res.success) {
-           // TODO 
+           // TODO
            return false;
          }
          article.voted = true;
@@ -549,7 +560,7 @@
  .remove-selected {
    background-color: #fff;
  }
- .up,.down {   
+ .up,.down {
    font-size: 10px;
    line-height:10px;
  }
