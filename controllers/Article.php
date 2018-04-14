@@ -76,8 +76,8 @@ class ArticleController extends NF_YambController
             $source = empty($f) ? '±±” »À¬€Ã≥' : $f[1];
 
             // remove bottom lines
-            $s = (($pos = strpos($content, '<br/><br/>')) === false) ? 0 : $pos + 10;
-            $e = (($pos = strpos($content, '<br/>--<br/>')) === false)
+            $s = (($pos = strrpos($content, '<br/><br/>')) === false) ? 0 : $pos + 10;
+            $e = (($pos = strrpos($content, '<br/>--<br/>')) === false)
                 ? strlen($content)
                 : $pos + 7;
             $content = preg_replace(
