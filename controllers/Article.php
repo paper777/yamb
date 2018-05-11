@@ -76,7 +76,8 @@ class ArticleController extends NF_YambController
             $source = empty($f) ? '±±” »À¬€Ã≥' : $f[1];
 
             // remove bottom lines
-            $s = (($pos = strrpos($content, '<br/><br/>')) === false) ? 0 : $pos + 10;
+            $s = (($pos = strpos($content, '<br/><br/>')) === false) ? 0 : $pos + 10;
+            // TODO: fix kbs on updating content which removed the bottom "--" 2018/05/05 @FredericDT
             $e = (($pos = strrpos($content, '<br/>--<br/>')) === false)
                 ? strlen($content)
                 : $pos + 7;

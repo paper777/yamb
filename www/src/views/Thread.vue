@@ -330,16 +330,20 @@
               label: '第' + (i + 1) + '页'
             }
           })
-          //process markdown content
+
+          // process markdown content
+          // last modified 2018/05/05 @FredericDT
+          let postContent = document.createElement('div');
           for (let i = 0; i < data.articles.length; ++i) {
-            let postContent = document.createElement('div');
             postContent.innerHTML = data.articles[i].content;
             let markdownNode = postContent.querySelectorAll('pre.markdown');
-            if (markdownNode.length > 0) {
-              data.articles[i].content = marked(markdownNode[0].innerText);
+            for (let j = 0; j < markdownNode.length; ++j) {
+              markdownNode[j].outerHTML = marked(markdownNode[j].innerText);
             }
+            data.articles[i].content = postContent.innerHTML;
           }
-          //process done
+          // process done
+
           if (data.articles[0]['id'] == this.gid) {
             [this.mainPost, ...this.posts] = data.articles;
           } else {
