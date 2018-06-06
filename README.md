@@ -37,29 +37,6 @@ cd www && link -sf ../app/modules/Yamb/www/dist/yamb .
 
 ```
 
-## TODOs
-
-### Thread(artticle) page
-
-forward article
-
-...
-
-### User profile page
-
-say hello (mail) to sb.
-
-add to friend list (optional)
-
-...
-
-
-### Search
-
-article search (in a specific board)
-
-...
-
 
 ## Contributing
 
