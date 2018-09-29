@@ -19,6 +19,14 @@ Vue.prototype.$http.defaults.headers.common = {
 
 sync(store, router);
 
+router.afterEach((to, from, next) => {
+  if (_hmt != false) { // Do not use `if (_hmt)`! JavaScript MAGIC!  - Henryzhao
+      if (to.path) {
+          _hmt.push(['_trackPageview', '' + to.fullPath]);
+      }
+  }
+});
+
 const app = new Vue({
   router,
   store,
