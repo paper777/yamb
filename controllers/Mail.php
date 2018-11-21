@@ -29,7 +29,7 @@ class MailController extends NF_YambController
             return $this->fail('mailbox is not available');
         }
 
-        $page = isset($this->params['url']['page']) ?: 1;
+        $page = isset($this->params['url']['page']) ? $this->params['url']['page'] : 1;
 
         load('inc/pagination');
 
