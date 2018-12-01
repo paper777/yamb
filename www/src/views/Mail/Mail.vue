@@ -12,43 +12,42 @@
 </template>
 
 <script>
-  export default {
-    // name: 'mail',
+export default {
+  // name: 'mail',
 
-    data () {
-      return {
-        mailTabActivated: {
-          inbox: true,
-          outbox: false,
-          deleted: false
-        },
+  data() {
+    return {
+      mailTabActivated: {
+        inbox: true,
+        outbox: false,
+        deleted: false
       }
-    },
+    };
+  },
 
-    created() {
-      let type = this.$route.params.type;
+  created() {
+    let type = this.$route.params.type;
+    this.changeMailTab(type);
+  },
+
+  methods: {
+    mailTabClicked(type) {
       this.changeMailTab(type);
+      this.$router.push({ name: "mailList", params: { type: type } });
     },
 
-    methods: {
-      mailTabClicked(type) {
-        this.changeMailTab(type);
-         this.$router.push({name: 'mailList', params: {type: type}});
-      },
-
-      changeMailTab(type) {
-        for (let key in this.mailTabActivated) {
-          this.mailTabActivated[key] = (key === type);
-        }
-      },
+    changeMailTab(type) {
+      for (let key in this.mailTabActivated) {
+        this.mailTabActivated[key] = key === type;
+      }
     }
-
   }
+};
 </script>
 
 <style scoped>
 .tabs {
-    margin-bottom: 0;
-    background-color: #fff;
+  margin-bottom: 0;
+  background-color: #fff;
 }
 </style>

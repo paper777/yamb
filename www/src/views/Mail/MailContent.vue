@@ -42,120 +42,121 @@
 </template>
 
 <script>
-  import * as api from 'api/mail';
-  import FloatButton from 'components/ReplyFloatButton';
+import * as api from "api/mail";
+import FloatButton from "components/ReplyFloatButton";
 
-  export default {
-    data() {
-      return {
+export default {
+  data() {
+    return {
+      query: {
+        type: "",
+        num: ""
+      },
 
+      mail: {
+        num: "",
+        title: "",
+        sender: "",
+        time: "",
+        content: ""
+      },
+
+      modalActive: {
+        replyModal: false,
+        forwardModal: false,
+        deleteModal: false
+      },
+
+      replyForm: {
+        isTitleDanger: false,
+        isContentDanger: false,
+        title: "",
+        content: ""
+      },
+
+      forwardForm: {
+        isTargetUserDanger: false,
+        targetUser: ""
+      },
+
+      isLoading: true,
+
+      error: false,
+      errorMessage: ""
+    };
+  },
+
+  components: {
+    FloatButton
+  },
+
+  created() {
+    this.query = this.$route.params;
+    this.fetchMail();
+  },
+
+  methods: {
+    fetchMail() {
+      this.isLoading = true;
+      api.getMail(this.query.type, this.query.num).then(res => {
+        if (!res.success) {
+          this.error = true;
+          this.errorMessage = `type: ${this.query.type}, num: ${
+            this.query.num
+          }`;
+          return false;
+        }
+        this.mail.num = res.data.num;
+        this.mail.title = res.data.title;
+        this.mail.sender = res.data.sender;
+        this.mail.time = res.data.time;
+        this.mail.content = res.data.content;
+
+        this.replyForm.title = this.mail.title.startsWith("Re: ")
+          ? this.mail.title
+          : "Re: " + this.mail.title;
+      });
+      this.error = false;
+      this.isLoading = false;
+    },
+
+    reply() {
+      this.$router.push({
+        name: `mailSend`,
         query: {
-          type: '',
-          num: ''
-        },
-
-        mail: {
-          num: '',
-          title: '',
-          sender: '',
-          time: '',
-          content: ''
-        },
-
-        modalActive: {
-          replyModal: false,
-          forwardModal: false,
-          deleteModal: false,
-        },
-
-        replyForm: {
-          isTitleDanger: false,
-          isContentDanger: false,
-          title: '',
-          content: '',
-        },
-
-        forwardForm: {
-          isTargetUserDanger: false,
-          targetUser: '',
-        },
-
-        isLoading: true,
-
-        error: false,
-        errorMessage: '',
-
-      }
-    },
-
-    components: {
-      FloatButton
-    },
-
-    created() {
-      this.query = this.$route.params;
-      this.fetchMail();
-    },
-
-    methods: {
-      fetchMail() {
-        this.isLoading = true;
-        api.getMail(this.query.type, this.query.num).then((res) =>{
-          if (! res.success) {
-            this.error = true;
-            this.errorMessage = `type: ${this.query.type}, num: ${this.query.num}`;
-            return false;
-          }
-          this.mail.num = res.data.num;
-          this.mail.title = res.data.title;
-          this.mail.sender = res.data.sender;
-          this.mail.time = res.data.time;
-          this.mail.content = res.data.content;
-
-          this.replyForm.title = this.mail.title.startsWith('Re: ') ?
-            this.mail.title: 'Re: ' + this.mail.title;
-        });
-        this.error = false;
-        this.isLoading = false;
-      },
-
-      reply() {
-          this.$router.push({
-            name: `mailSend`,
-            query: {
-              action: 'reply',
-              to: this.mail.sender,
-              title: this.mail.title.startsWith('Re: ') ? this.mail.title: 'Re: ' + this.mail.title,
-              type: this.query.type,
-              num: this.query.num,
-            }
-          });
-      },
-
+          action: "reply",
+          to: this.mail.sender,
+          title: this.mail.title.startsWith("Re: ")
+            ? this.mail.title
+            : "Re: " + this.mail.title,
+          type: this.query.type,
+          num: this.query.num
+        }
+      });
     }
   }
+};
 </script>
 
 <style scoped>
-  .mail {
-    padding: 16px 16px;
-    background-color: #fff;
-  }
-  .mail-inscribe {
-    color: #aaa;
-    margin: 8px 0;
-  }
-  .clear {
-    clear: both;
-  }
-  .error {
-    text-align:center;
-    color: #aaa;
-  }
-  .textarea {
-
-  }
-  .invisible {
-    visibility: hidden;
-  }
+.mail {
+  padding: 16px 16px;
+  background-color: #fff;
+}
+.mail-inscribe {
+  color: #aaa;
+  margin: 8px 0;
+}
+.clear {
+  clear: both;
+}
+.error {
+  text-align: center;
+  color: #aaa;
+}
+.textarea {
+}
+.invisible {
+  visibility: hidden;
+}
 </style>

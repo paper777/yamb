@@ -6,14 +6,11 @@
         <h4 class="title is-4"
             v-bind:class="{ notRead: !read , hasRead: read}">
           {{ title }}
-          <!-- The num here is for debugging
-          <span class="num is-pulled-right">{{ num }}</span>
-          -->
         </h4>
 
         <div class="inscribe">
           <span class="is-pulled-left">from&nbsp; {{ sender }}</span>
-          &nbsp
+          &nbsp;
           <span class="is-pulled-right">{{ time }}</span>
         </div>
 
@@ -23,34 +20,26 @@
 </template>
 
 <script>
-  export default {
-    name: 'mailitem',
-    props: [
-      'read',
-      'num',
-      'sender',
-      'title',
-      'time',
-      'size',
-      'linker'
-    ]
-  }
+export default {
+  name: "mailitem",
+  props: ["read", "num", "sender", "title", "time", "size", "linker"]
+};
 </script>
 
 <style scoped>
-  .box {
-    border-radius: 0;
-  }
-  .inscribe {
-    color: #ccc;
-  }
-  .notRead {
-    /*font-weight: normal;*/
-  }
-  .hasRead {
-    color: #aaa;
-  }
-  .num {
-    color: #ccc;
-  }
+.box {
+  border-radius: 0;
+}
+.inscribe {
+  color: #ccc;
+}
+.notRead {
+  /*font-weight: normal;*/
+}
+.hasRead {
+  color: #aaa;
+}
+.num {
+  color: #ccc;
+}
 </style>

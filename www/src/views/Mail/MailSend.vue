@@ -55,48 +55,46 @@
 </template>
 
 <script>
-import * as api from 'api/mail.js';
+import * as api from "api/mail.js";
 export default {
-  data () {
-    return  {
+  data() {
+    return {
       pageLoading: false,
       attachment: true,
-      type: 'new', // new article OR reply article OR edit article
-      title: '',
-      content: '',
-      to: '',
+      type: "new", // new article OR reply article OR edit article
+      title: "",
+      content: "",
+      to: "",
       showSmileBox: false,
-      activeSmileSuite: 'em',
+      activeSmileSuite: "em",
       smiles: [
         {
-          name: 'em',
-          size: '32x32',
-          serials:[...Array(73).keys()].map(n => n + 1)
+          name: "em",
+          size: "32x32",
+          serials: [...Array(73).keys()].map(n => n + 1)
         },
         {
-          name: 'ema',
-          size: '48x48',
-          serials:[...Array(42).keys()]
+          name: "ema",
+          size: "48x48",
+          serials: [...Array(42).keys()]
         },
         {
-          name: 'emb',
-          size: '48x48',
-          serials:[...Array(25).keys()]
+          name: "emb",
+          size: "48x48",
+          serials: [...Array(25).keys()]
         },
         {
-          name: 'emc',
-          size: '48x48',
-          serials:[...Array(53).keys()]
-        },
+          name: "emc",
+          size: "48x48",
+          serials: [...Array(53).keys()]
+        }
       ],
 
       showUploadBox: true,
       showUploadLoader: false,
       uploadItems: [],
       files: []
-
     };
-
   },
 
   created() {
@@ -125,7 +123,7 @@ export default {
     },
 
     onSend() {
-      switch(this.action) {
+      switch (this.action) {
         case "reply":
           this.replyMail();
           break;
@@ -133,7 +131,7 @@ export default {
           this.sendMail();
           break;
         default:
-          this.$toast('参数错误');
+          this.$toast("参数错误");
       }
     },
 
@@ -141,172 +139,164 @@ export default {
       let data = {
         title: this.title,
         content: this.content,
-        id: this.query.to,
+        id: this.query.to
       };
       if (!data.id || !data.title || !data.content) {
         this.pageLoading = false;
         if (!data.id)
-          this.$toast('Oops，忘记要发给谁了...返回上级重进此页面试一下？');
-        else if (!data.title)
-          this.$toast('Oops，标题不能为空');
-        else if (!data.content)
-          this.$toast('Oops，内容不能为空');
+          this.$toast("Oops，忘记要发给谁了...返回上级重进此页面试一下？");
+        else if (!data.title) this.$toast("Oops，标题不能为空");
+        else if (!data.content) this.$toast("Oops，内容不能为空");
         return false;
       }
-      api.sendMail(data)
-        .then(res => {
-          this.pageLoading = false;
-          if (!res.success) {
-            this.$toast('发送失败...');
-            return false;
+      api.sendMail(data).then(res => {
+        this.pageLoading = false;
+        if (!res.success) {
+          this.$toast("发送失败...");
+          return false;
+        }
+        this.$toast("发送成功", {
+          duration: 1000,
+          callback: () => {
+            this.$router.go(-1);
           }
-          this.$toast('发送成功', {
-            duration: 1000,
-            callback: () => {
-              this.$router.go(-1);
-            }
-          });
-        })
+        });
+      });
     },
 
     replyMail() {
       let data = {
         title: this.title,
-        content: this.content,
+        content: this.content
       };
       if (!data.title || !data.content) {
         this.pageLoading = false;
-        if (!data.title)
-          this.$toast('Oops，标题不能为空');
-        else if(!data.content)
-          this.$toast('Oops，内容不能为空');
+        if (!data.title) this.$toast("Oops，标题不能为空");
+        else if (!data.content) this.$toast("Oops，内容不能为空");
         return false;
       }
-      api.replyMail(this.query.type, this.query.num, data)
-        .then(res => {
-          this.pageLoading = false;
-          if (!res.success) {
-            this.$toast('发送失败...');
-            return false;
+      api.replyMail(this.query.type, this.query.num, data).then(res => {
+        this.pageLoading = false;
+        if (!res.success) {
+          this.$toast("发送失败...");
+          return false;
+        }
+        this.$toast("发送成功", {
+          duration: 1000,
+          callback: () => {
+            this.$router.go(-1);
           }
-          this.$toast('发送成功', {
-            duration: 1000,
-            callback: () => {
-              this.$router.go(-1);
-            }
-          });
         });
-    },
-
-
-
+      });
+    }
   }
-}
+};
 </script>
 <style scoped>
-.input, .textarea {
-    border-radius: 0;
-    border-color: #fff;
+.input,
+.textarea {
+  border-radius: 0;
+  border-color: #fff;
 }
 .toolbar .columns {
-    padding: 0 1rem;
+  padding: 0 1rem;
 }
 .column {
-    width: auto !important;
+  width: auto !important;
 }
 .post-button {
-    margin-left: 45%;
+  margin-left: 45%;
 }
-.column, .file-field {
-    position: relative;
+.column,
+.file-field {
+  position: relative;
 }
 .file-field input {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 48px;
-    opacity: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 48px;
+  opacity: 0;
 }
 .smile-box {
-    margin-top: 1rem;
+  margin-top: 1rem;
 }
 .smile-box > .tabs {
-    margin-bottom: 0.3rem;
+  margin-bottom: 0.3rem;
 }
 .smile-images > figure {
-    display: inline-block;
-    margin: 0 1px;
+  display: inline-block;
+  margin: 0 1px;
 }
 .upload-box {
-    margin-top: 1rem;
-    padding: 0 0.5rem;
+  margin-top: 1rem;
+  padding: 0 0.5rem;
 }
 
 .upload-item {
-    margin: 1rem 1rem 0 0;
-    position: relative;
-    display: inline-block;
-    height: 120px;
-    width: 80px;
+  margin: 1rem 1rem 0 0;
+  position: relative;
+  display: inline-block;
+  height: 120px;
+  width: 80px;
 }
 .upload-item > span {
-    height: 100%;
-    width: 100%;
-    display: inline-block;
-    box-shadow: 0 1px 3px 1px rgba(0,0,0,.2);
-    background-size: cover;
-    background-position: center;
+  height: 100%;
+  width: 100%;
+  display: inline-block;
+  box-shadow: 0 1px 3px 1px rgba(0, 0, 0, 0.2);
+  background-size: cover;
+  background-position: center;
 }
 
 .upload-item > .close-btn {
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    top: -12px;
-    right: -10px;
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  top: -12px;
+  right: -10px;
 }
 .ball-pulse {
-    position: absolute;
-    top: 50px;
-    left: 0;
+  position: absolute;
+  top: 50px;
+  left: 0;
 }
 .new-upload-icon {
-    position: absolute;
-    top: 48px;
-    left: 28px;
+  position: absolute;
+  top: 48px;
+  left: 28px;
 }
 .new-upload {
-    box-shadow: 0 1px 3px 1px rgba(0,0,0,.2);
+  box-shadow: 0 1px 3px 1px rgba(0, 0, 0, 0.2);
 }
 .new-upload input {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 80px;
-    height: 120px;
-    opacity: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 80px;
+  height: 120px;
+  opacity: 0;
 }
 
 .loading-section {
-    position: fixed;
-    z-index: 5000;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: rgba(0, 0, 0, .25);
+  position: fixed;
+  z-index: 5000;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.25);
 }
 .loading-section .loading {
-    width: 12rem;
-    height: 4rem;
-    position: relative;
-    text-align: center;
-
+  width: 12rem;
+  height: 4rem;
+  position: relative;
+  text-align: center;
 }
 .to {
-    color: #777777;
+  color: #777777;
 }
 </style>
