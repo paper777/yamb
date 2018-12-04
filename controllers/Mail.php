@@ -57,7 +57,7 @@ class MailController extends NF_YambController
         unset($info);
 
         $data = [
-            'mails' => $mails,
+            'mails'      => $mails,
             'pagination' => [
                 'current' => $pagination->getCurPage(),
                 'total'   => $pagination->getTotalPage(),
