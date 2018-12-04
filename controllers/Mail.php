@@ -56,7 +56,15 @@ class MailController extends NF_YambController
         $mails = $info;
         unset($info);
 
-        return $this->success(compact('mails', 'pagination'));
+        $data = [
+            'mails' => $mails,
+            'pagination' => [
+                'current' => $pagination->getCurPage(),
+                'total'   => $pagination->getTotalPage(),
+            ],
+        ];
+
+        return $this->success($data);
     }
 
     public function showAction()
