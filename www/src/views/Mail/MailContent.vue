@@ -1,19 +1,17 @@
 <template>
-
   <div class="main">
-
     <!-- Loader -->
     <div class="page-loading loader-inner ball-pulse" v-if="isLoading">
-      <div> </div> <div> </div> <div> </div>
+      <div></div>
+      <div></div>
+      <div></div>
     </div>
 
     <!-- Mail -->
     <div>
       <div class="mail" v-if="!error">
-        <div class='mail-title'>
-          <h4 class="title is-4">
-            {{ mail.title }}
-          </h4>
+        <div class="mail-title">
+          <h4 class="title is-4">{{ mail.title }}</h4>
         </div>
         <div class="mail-inscribe">
           <span class="sender is-pulled-left">from: &nbsp;{{ mail.sender }}</span>
@@ -27,18 +25,16 @@
       </div>
 
       <div v-else class="error">
-        <div> Oops, there is an error... </div>
+        <div>Oops, there is an error...</div>
         <div>{{ errorMessage }}</div>
       </div>
     </div>
 
     <!-- FAB -->
-    <div v-if="this.query.type !== 'deleted' && !error">
-      <float-button @click.native='reply'></float-button>
+    <div v-if="this.mailType !== 'deleted' && !error">
+      <float-button @click.native="reply"></float-button>
     </div>
-
   </div>
-
 </template>
 
 <script>
@@ -48,11 +44,6 @@ import FloatButton from "components/ReplyFloatButton";
 export default {
   data() {
     return {
-      query: {
-        type: "",
-        num: ""
-      },
-
       mail: {
         num: "",
         title: "",
@@ -86,37 +77,43 @@ export default {
     };
   },
 
+  computed: {
+    mailType: function() {
+      return this.$route.params.type;
+    },
+    mailNum: function() {
+      return this.$route.params.num;
+    }
+  },
+
   components: {
     FloatButton
   },
 
   created() {
-    this.query = this.$route.params;
     this.fetchMail();
   },
 
   methods: {
-    fetchMail() {
+    async fetchMail() {
       this.isLoading = true;
-      api.getMail(this.query.type, this.query.num).then(res => {
-        if (!res.success) {
-          this.error = true;
-          this.errorMessage = `type: ${this.query.type}, num: ${
-            this.query.num
-          }`;
-          return false;
-        }
-        this.mail.num = res.data.num;
-        this.mail.title = res.data.title;
-        this.mail.sender = res.data.sender;
-        this.mail.time = res.data.time;
-        this.mail.content = res.data.content;
-
-        this.replyForm.title = this.mail.title.startsWith("Re: ")
-          ? this.mail.title
-          : "Re: " + this.mail.title;
-      });
+      const res = await api.getMail(this.mailType, this.mailNum);
+      if (!res.success) {
+        this.error = true;
+        this.$toast("Oops, there is an error...");
+        this.isLoading = false;
+        return false;
+      }
       this.error = false;
+
+      this.mail.num = res.data.num;
+      this.mail.title = res.data.title;
+      this.mail.sender = res.data.sender;
+      this.mail.time = res.data.time;
+      this.mail.content = res.data.content;
+      this.replyForm.title = this.mail.title.startsWith("Re: ")
+        ? this.mail.title
+        : "Re: " + this.mail.title;
       this.isLoading = false;
     },
 
@@ -129,8 +126,8 @@ export default {
           title: this.mail.title.startsWith("Re: ")
             ? this.mail.title
             : "Re: " + this.mail.title,
-          type: this.query.type,
-          num: this.query.num
+          type: this.mailType,
+          num: this.mailNum
         }
       });
     }

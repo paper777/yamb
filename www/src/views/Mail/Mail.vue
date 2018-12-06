@@ -2,9 +2,15 @@
   <div class="container">
     <div class="tabs is-fullwidth">
       <ul>
-        <li :class="{ 'is-active': mailTabActivated.inbox }"><a @click="mailTabClicked('inbox')">收件箱</a></li>
-        <li :class="{ 'is-active': mailTabActivated.outbox }"><a @click="mailTabClicked('outbox')">发件箱</a></li>
-        <li :class="{ 'is-active': mailTabActivated.deleted }"><a @click="mailTabClicked('deleted')">垃圾箱</a></li>
+        <li :class="{ 'is-active': mailTabActivated.inbox }">
+          <a @click="mailTabClicked('inbox')">收件箱</a>
+        </li>
+        <li :class="{ 'is-active': mailTabActivated.outbox }">
+          <a @click="mailTabClicked('outbox')">发件箱</a>
+        </li>
+        <li :class="{ 'is-active': mailTabActivated.deleted }">
+          <a @click="mailTabClicked('deleted')">垃圾箱</a>
+        </li>
       </ul>
     </div>
     <router-view></router-view>
@@ -13,8 +19,6 @@
 
 <script>
 export default {
-  // name: 'mail',
-
   data() {
     return {
       mailTabActivated: {
@@ -26,8 +30,7 @@ export default {
   },
 
   created() {
-    let type = this.$route.params.type;
-    this.changeMailTab(type);
+    this.changeMailTab(this.$route.params.type);
   },
 
   methods: {

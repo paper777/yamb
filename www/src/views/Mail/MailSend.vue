@@ -5,7 +5,8 @@
     <textarea class="textarea" placeholder="写下你想对TA说什么吧" rows="10" v-model="content"></textarea>
     <div class="toolbar card">
       <header class="columns is-mobile">
-        <div class="column is-2"> <i class="iconfont icon icon-smile" @click="expandSmileBox()"></i>
+        <div class="column is-2">
+          <i class="iconfont icon icon-smile" @click="expandSmileBox()"></i>
         </div>
         <div class="column is-2 post-button is-offset-7">
           <a @click="onSend()">发送</a>
@@ -15,21 +16,38 @@
     <section class="smile-box" v-if="showSmileBox">
       <div class="tabs">
         <ul>
-          <li :class="activeSmileSuite == 'em' ? 'is-active' : ''" @click="clickSmileSuite('em')"><a>经典</a></li>
-          <li :class="activeSmileSuite == 'ema' ? 'is-active' : ''" @click="clickSmileSuite('ema')"><a>悠嘻猴</a></li>
-          <li :class="activeSmileSuite == 'emb' ? 'is-active' : ''" @click="clickSmileSuite('emb')"><a>兔斯基</a></li>
-          <li :class="activeSmileSuite == 'emc' ? 'is-active' : ''" @click="clickSmileSuite('emc')"><a>洋葱头</a></li>
+          <li :class="activeSmileSuite == 'em' ? 'is-active' : ''" @click="clickSmileSuite('em')">
+            <a>经典</a>
+          </li>
+          <li :class="activeSmileSuite == 'ema' ? 'is-active' : ''" @click="clickSmileSuite('ema')">
+            <a>悠嘻猴</a>
+          </li>
+          <li :class="activeSmileSuite == 'emb' ? 'is-active' : ''" @click="clickSmileSuite('emb')">
+            <a>兔斯基</a>
+          </li>
+          <li :class="activeSmileSuite == 'emc' ? 'is-active' : ''" @click="clickSmileSuite('emc')">
+            <a>洋葱头</a>
+          </li>
         </ul>
       </div>
-      <div class="smile-images" v-for="meta in smiles" :key="meta.name" v-if="meta.name == activeSmileSuite">
-        <figure :class="`image is-${meta.size}`" v-for="i in meta.serials" :key="i" @click="insertSmile(meta.name, i)">
-          <img alt="" :src="`//bbs.byr.cn/img/ubb/${meta.name}/${i}.gif`"/>
+      <div
+        class="smile-images"
+        v-for="meta in smiles"
+        :key="meta.name"
+        v-if="meta.name == activeSmileSuite"
+      >
+        <figure
+          :class="`image is-${meta.size}`"
+          v-for="i in meta.serials"
+          :key="i"
+          @click="insertSmile(meta.name, i)"
+        >
+          <img alt :src="`//bbs.byr.cn/img/ubb/${meta.name}/${i}.gif`">
         </figure>
       </div>
     </section>
     <section class="upload-box" v-if="attachment && showUploadBox">
-
-      <div class="upload-item" v-for="(item, index) in uploadItems" :key="index" >
+      <div class="upload-item" v-for="(item, index) in uploadItems" :key="index">
         <span :style="'background-image: url(' + item + ')'"></span>
         <div class="close-btn" @click="removeImage(index)">
           <i class="icon iconfont icon-wrong"></i>
@@ -37,19 +55,26 @@
       </div>
 
       <div class="upload-item" v-show="showUploadLoader">
-        <div class="ball-pulse"><div></div><div></div><div></div></div>
+        <div class="ball-pulse">
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
       </div>
       <div class="upload-item new-upload" v-show="uploadItems.length">
         <div class="new-upload-icon">
           <i class="icon iconfont icon-add"></i>
         </div>
-          <input type="file" accept="image/*" name="attachment" id="attachment2">
+        <input type="file" accept="image/*" name="attachment" id="attachment2">
       </div>
-
     </section>
 
     <div class="loading-section" v-if="pageLoading">
-        <div class="loading ball-pulse"><div></div><div></div><div></div></div>
+      <div class="loading ball-pulse">
+        <div></div>
+        <div></div>
+        <div></div>
+      </div>
     </div>
   </section>
 </template>
@@ -135,8 +160,8 @@ export default {
       }
     },
 
-    sendMail() {
-      let data = {
+    async sendMail() {
+      const data = {
         title: this.title,
         content: this.content,
         id: this.query.to
@@ -149,22 +174,21 @@ export default {
         else if (!data.content) this.$toast("Oops，内容不能为空");
         return false;
       }
-      api.sendMail(data).then(res => {
-        this.pageLoading = false;
-        if (!res.success) {
-          this.$toast("发送失败...");
-          return false;
+      const res = await api.sendMail(data);
+      this.pageLoading = false;
+      if (!res.success) {
+        this.$toast("发送失败...");
+        return false;
+      }
+      this.$toast("发送成功", {
+        duration: 800,
+        callback: () => {
+          this.$router.go(-1);
         }
-        this.$toast("发送成功", {
-          duration: 1000,
-          callback: () => {
-            this.$router.go(-1);
-          }
-        });
       });
     },
 
-    replyMail() {
+    async replyMail() {
       let data = {
         title: this.title,
         content: this.content
@@ -175,18 +199,16 @@ export default {
         else if (!data.content) this.$toast("Oops，内容不能为空");
         return false;
       }
-      api.replyMail(this.query.type, this.query.num, data).then(res => {
-        this.pageLoading = false;
-        if (!res.success) {
-          this.$toast("发送失败...");
-          return false;
+      let res = await api.replyMail(this.query.type, this.query.num, data);
+      if (!res.success) {
+        this.$toast("发送失败...");
+        return false;
+      }
+      this.$toast("发送成功", {
+        duration: 800,
+        callback: () => {
+          this.$router.go(-1);
         }
-        this.$toast("发送成功", {
-          duration: 1000,
-          callback: () => {
-            this.$router.go(-1);
-          }
-        });
       });
     }
   }
