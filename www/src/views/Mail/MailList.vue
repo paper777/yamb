@@ -42,7 +42,6 @@
   </section>
 </template>
 <script>
-// TODO: pagination
 import * as api from "api/mail";
 import MailItem from "components/MailItem";
 export default {
@@ -77,6 +76,7 @@ export default {
   watch: {
     "$route.params.type"(newType, oldType) {
       this.mails = [];
+      this.currentPage = 1;
       this.fetchMailList(newType);
     }
   },
